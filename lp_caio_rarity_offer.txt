@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rarity Agency - Growth for Startups</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background-color: #0D0D0D;
+            --text-color: #F5F5F5;
+            --primary-accent: #8A2BE2;
+            --secondary-accent: #DA70D6;
+            --font-main: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .main-container {
+            max-width: 1100px;
+            width: 90%;
+            padding: 2rem 0;
+        }
+
+        .header {
+            padding: 2rem 0;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header img {
+            max-width: 180px;
+            height: auto;
+        }
+
+        .hero-section {
+            padding: 3rem 0;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .hero-section h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            line-height: 1.2;
+        }
+
+        .hero-section h1 span {
+            background: -webkit-linear-gradient(45deg, var(--primary-accent), var(--secondary-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-section p {
+            font-size: 1.25rem;
+            max-width: 700px;
+            margin: 0 auto 2rem auto;
+            color: #b0b0b0;
+            font-weight: 400;
+        }
+
+        .video-section {
+            padding: 2rem 0;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .video-section h2 {
+            font-size: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #b0b0b0;
+            margin-bottom: 1.5rem;
+        }
+
+        .video-placeholder {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            background-color: #222;
+            border: 1px solid #333;
+            border-radius: 12px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .video-placeholder::before {
+            content: '►';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5rem;
+            color: rgba(255, 255, 255, 0.7);
+            transition: transform 0.3s ease;
+        }
+        
+        .video-placeholder:hover::before {
+             transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .cta-section {
+            padding: 3rem 0;
+            animation: fadeInUp 1.5s ease-out;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--primary-accent), var(--secondary-accent));
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(138, 43, 226, 0.5);
+        }
+
+        .footer {
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-top: 1px solid #222;
+            width: 90%;
+            max-width: 1100px;
+        }
+
+        .footer p {
+            font-size: 0.9rem;
+            color: #888;
+        }
+        
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 2.8rem;
+            }
+            .hero-section p {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero-section h1 {
+                font-size: 2.2rem;
+            }
+             .header img {
+                max-width: 140px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+
+        <header class="header">
+            <a href="https://rarityagency.io/" target="_blank">
+                <img src="https://rarityagency.io/wp-content/uploads/2024/05/logo-rarity.svg" alt="Rarity Agency Logo">
+            </a>
+        </header>
+
+        <main>
+            <section class="hero-section">
+                <h1>Unlock Your <span>Growth Engine</span></h1>
+                <p>
+                    We build scalable growth systems for startups and e-commerce brands, turning creative strategies into measurable profit.
+                </p>
+            </section>
+
+            <section class="video-section">
+                <h2>SEE OUR APPROACH IN ACTION</h2>
+                <div class="video-placeholder" onclick="alert('Video player will be implemented here.');">
+                    </div>
+            </section>
+
+            <section class="cta-section">
+                <a href="#contact" class="cta-button">
+                    Book a Free Strategy Call
+                </a>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>Rarity Agency © 2025 | All rights reserved.</p>
+        </footer>
+
+    </div>
+
+</body>
+</html>
