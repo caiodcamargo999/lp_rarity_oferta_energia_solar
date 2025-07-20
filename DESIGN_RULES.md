@@ -189,7 +189,9 @@
 ### **File Structure**
 ```
 lp_caio_rarity_offer-main/
-├── lp_caio_rarity_offer.html
+├── index.html (IP-based language detection)
+├── lp_caio_rarity_offer.html (English version)
+├── lp_caio_rarity_offer_pt.html (Portuguese version)
 ├── rarity_logo.png
 ├── README.md
 └── DESIGN_RULES.md
@@ -220,6 +222,9 @@ lp_caio_rarity_offer-main/
 - [x] Responsive design
 - [x] Success cases section
 - [x] Call-to-action button
+- [x] IP-based language detection
+- [x] Portuguese version
+- [x] Language switching buttons
 
 ---
 
