@@ -1,0 +1,9 @@
+# Serve index.html at root (handles IP-based language detection)
+/ /index.html 200
+
+# Direct access to language versions
+/en /lp_caio_rarity_offer.html 200
+/pt /lp_caio_rarity_offer_pt.html 200
+
+# Fallback for 404s
+/* /index.html 404 
