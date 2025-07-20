@@ -18,15 +18,15 @@
                 // Check if user is from a Portuguese-speaking country
                 if (portugueseCountries.includes(data.country_code)) {
                     // Redirect to Portuguese version
-                    window.location.href = 'lp_caio_rarity_offer_pt.html';
+                    window.location.href = '/pt';
                 } else {
                     // Redirect to English version
-                    window.location.href = 'lp_caio_rarity_offer.html';
+                    window.location.href = '/en';
                 }
             } catch (error) {
                 console.log('Error detecting location, defaulting to English');
                 // Fallback to English version
-                window.location.href = 'lp_caio_rarity_offer.html';
+                window.location.href = '/en';
             }
         }
 
@@ -40,9 +40,9 @@
             <h2>Detectando sua localização...</h2>
             <p>Redirecionando para a versão apropriada...</p>
             <div style="margin-top: 20px;">
-                <a href="lp_caio_rarity_offer.html" style="color: #8A2BE2; text-decoration: none; margin: 0 10px;">English</a>
+                <a href="/en" style="color: #8A2BE2; text-decoration: none; margin: 0 10px;">English</a>
                 <span style="color: #666;">|</span>
-                <a href="lp_caio_rarity_offer_pt.html" style="color: #8A2BE2; text-decoration: none; margin: 0 10px;">Português</a>
+                <a href="/pt" style="color: #8A2BE2; text-decoration: none; margin: 0 10px;">Português</a>
             </div>
         </div>
     </div>
