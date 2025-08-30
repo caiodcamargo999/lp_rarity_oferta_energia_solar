@@ -1,18 +1,20 @@
 import type { Metadata } from 'next'
-import { Inter, Poppins } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import './globals.css'
 
-
-const poppins = Poppins({ 
+// ===== FONTE INTER DESIGNERFLIX =====
+const inter = Inter({
   subsets: ['latin'],
-  weight: ['400', '600', '700'],
-  variable: '--font-poppins',
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--font-inter',
+  preload: true,
 })
 
 export const metadata: Metadata = {
-  title: 'Rarity Agency - Growth for Startups | Unlock Your Growth Engine',
-  description: 'Transform your startup with Rarity Agency\'s proven growth strategies. AI, automation, and business scaling solutions that deliver results. Book your free strategy call today.',
-  keywords: 'growth agency, startup growth, digital marketing, AI automation, business scaling, growth strategies',
+  title: 'Escale sua Empresa de Energia Solar - Desbloqueia as Vendas | Rarity Agency',
+  description: 'Transforme sua empresa de energia solar em uma máquina de vendas. Implementamos sistemas que automatizam 80% do processo de vendas usando IA + Anúncios Online. Agende sua sessão estratégica gratuita.',
+  keywords: 'energia solar, vendas energia solar, marketing energia solar, automação vendas, IA marketing, anúncios online, crescimento empresa solar, agência marketing solar',
   authors: [{ name: 'Rarity Agency' }],
   creator: 'Rarity Agency',
   publisher: 'Rarity Agency',
@@ -26,25 +28,25 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'Rarity Agency - Growth for Startups',
-    description: 'Unlock Your Growth Engine with proven strategies for AI, automation, and business scaling.',
+    title: 'Escale sua Empresa de Energia Solar - Desbloqueia as Vendas',
+    description: 'Transforme sua empresa de energia solar em uma máquina de vendas. Sistemas automatizados com IA + Anúncios Online para multiplicar resultados.',
     url: 'https://rarityagency.io',
     siteName: 'Rarity Agency',
+    locale: 'pt_BR',
+    type: 'website',
     images: [
       {
         url: '/rarity_logo.png',
         width: 1200,
         height: 630,
-        alt: 'Rarity Agency Logo',
+        alt: 'Rarity Agency - Especialistas em Marketing para Energia Solar',
       },
     ],
-    locale: 'en_US',
-    type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Rarity Agency - Growth for Startups',
-    description: 'Unlock Your Growth Engine with proven strategies for AI, automation, and business scaling.',
+    title: 'Escale sua Empresa de Energia Solar - Desbloqueia as Vendas',
+    description: 'Transforme sua empresa de energia solar em uma máquina de vendas. Sistemas automatizados com IA + Anúncios Online.',
     images: ['/rarity_logo.png'],
   },
   robots: {
@@ -69,7 +71,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         {/* DNS Prefetch for external domains */}
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
@@ -91,9 +93,9 @@ export default function RootLayout({
         
         {/* Performance optimizations */}
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="theme-color" content="#8A2BE2" />
+        <meta name="theme-color" content="#0F6AE7" />
       </head>
-      <body className={`${poppins.variable} font-poppins bg-slate-900 min-h-screen`}>
+      <body className={`${inter.variable} font-inter bg-black min-h-screen`}>
         {children}
       </body>
     </html>

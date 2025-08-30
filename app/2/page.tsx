@@ -3,11 +3,19 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useState } from 'react'
 import VideoSection from '../../components/VideoSection'
 import SuccessCases from '../../components/SuccessCases'
 
 export default function HomePageV2() {
   // Versão /2: Com delays solicitados
+  const [showUrgency, setShowUrgency] = useState(false)
+  const [showCTA, setShowCTA] = useState(false)
+
+  const handleVideoTimeUpdate = (time: number) => {
+    // Versão 2: timing controlado pelo VideoSection
+    console.log(`⏱️ Tempo do vídeo: ${Math.floor(time)}s`)
+  }
 
   return (
     <main className="min-h-screen w-full">
@@ -38,26 +46,35 @@ export default function HomePageV2() {
         transition={{ duration: 1.5, ease: "easeOut" }}
       >
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-text-primary mb-6 leading-tight">
+          <h1 className="text-h1 font-bold text-text-primary mb-6 leading-tight tracking-tight">
             <span className="gradient-text">DOBRE</span> suas Vendas de Placas Solares<br/>
-            <span className="text-2xl md:text-3xl lg:text-4xl text-text-secondary mt-4 block">
+            <span className="text-h3 font-semibold text-text-secondary mt-4 block">
               em 60 dias
             </span>
           </h1>
           
-          <p className="text-lg md:text-xl text-text-secondary mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-body text-text-secondary mb-8 max-w-3xl mx-auto leading-relaxed tracking-normal">
             <strong className="text-text-primary">Empresas de energia solar</strong> estão perdendo milhões em vendas por não usar <span className="gradient-text">IA + Anúncios Online</span>. 
             <br/><br/>
-            Nós implementamos sistemas que <strong className="text-primary">automatizam 80% do processo de vendas</strong> e multiplicam seus resultados usando estratégias comprovadas de <span className="gradient-text">copywriting persuasivo</span>, <span className="text-primary">automação inteligente</span> e <span className="gradient-text">anúncios online em escala</span>.
+            Nós implementamos sistemas que <strong className="text-text-primary">automatizam 80% do processo de vendas</strong> e multiplicam seus resultados usando estratégias comprovadas de <span className="gradient-text">copywriting persuasivo</span>, <span className="text-primary">automação inteligente</span> e <span className="gradient-text">anúncios online em escala</span>.
           </p>
         </div>
       </motion.section>
 
       {/* Video Section - Versão com delays */}
-      <VideoSection version="2" />
+      <VideoSection 
+        version="2" 
+        onTimeUpdate={handleVideoTimeUpdate}
+        onUrgencyChange={setShowUrgency}
+        onCTAChange={setShowCTA}
+      />
 
       {/* Success Cases Section */}
-      <SuccessCases version="2" />
+      <SuccessCases 
+        version="2" 
+        showUrgency={showUrgency}
+        showCTA={showCTA}
+      />
 
       {/* Footer */}
       <footer className="text-center py-8 border-t border-white/10">

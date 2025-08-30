@@ -3,13 +3,16 @@
 import { motion } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import VideoPerformanceMonitor from './VideoPerformanceMonitor'
 
 interface VideoSectionProps {
   version?: "1" | "2"
   onTimeUpdate?: (time: number) => void
+  onUrgencyChange?: (show: boolean) => void
+  onCTAChange?: (show: boolean) => void
 }
 
-export default function VideoSection({ version = "1", onTimeUpdate }: VideoSectionProps) {
+export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyChange, onCTAChange }: VideoSectionProps) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [showCTA, setShowCTA] = useState(false)
   const [showUrgency, setShowUrgency] = useState(false)
@@ -29,12 +32,16 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
       if (version === "2") {
         // Mostrar seção de urgência após 1:00 (60 segundos) de vídeo
         if (video.currentTime >= 60 && !showUrgency) {
+          console.log('⏰ 1:00 atingido - Mostrando seção de urgência!')
           setShowUrgency(true)
+          if (onUrgencyChange) onUrgencyChange(true)
         }
         
-        // Mostrar CTA após 1:20 (80 segundos) de vídeo
-        if (video.currentTime >= 80 && !showCTA) {
+        // Mostrar CTA após 1:40 (100 segundos) de vídeo
+        if (video.currentTime >= 100 && !showCTA) {
+          console.log('🎯 1:40 atingido - Matheus falou "clique no botão abaixo"!')
           setShowCTA(true)
+          if (onCTAChange) onCTAChange(true)
         }
       }
     }
@@ -53,24 +60,61 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
     }
 
     const handleError = (e: Event) => {
-      console.error('Erro ao carregar vídeo:', e)
+      console.error('❌ Erro ao carregar vídeo:', e)
+      const target = e.target as HTMLVideoElement
+      if (target.error) {
+        console.error('📋 Detalhes do erro do vídeo:', {
+          code: target.error.code,
+          message: target.error.message
+        })
+      }
+    }
+
+    const handleLoadStart = () => {
+      console.log('🚀 Iniciando carregamento do vídeo...')
+    }
+
+    const handleProgress = () => {
+      console.log('📈 Progresso do carregamento do vídeo...')
+    }
+
+    const handleCanPlayThrough = () => {
+      console.log('🎯 Vídeo pode ser reproduzido completamente!')
     }
 
     video.addEventListener('timeupdate', handleTimeUpdate)
     video.addEventListener('loadeddata', handleLoadedData)
     video.addEventListener('canplay', handleCanPlay)
     video.addEventListener('error', handleError)
+    video.addEventListener('loadstart', handleLoadStart)
+    video.addEventListener('progress', handleProgress)
+    video.addEventListener('canplaythrough', handleCanPlayThrough)
 
     return () => {
       video.removeEventListener('timeupdate', handleTimeUpdate)
       video.removeEventListener('loadeddata', handleLoadedData)
       video.removeEventListener('canplay', handleCanPlay)
       video.removeEventListener('error', handleError)
+      video.removeEventListener('loadstart', handleLoadStart)
+      video.removeEventListener('progress', handleProgress)
+      video.removeEventListener('canplaythrough', handleCanPlayThrough)
     }
-  }, [onTimeUpdate, showCTA, showUrgency, version])
+  }, [onTimeUpdate, showCTA, showUrgency, version, onUrgencyChange, onCTAChange])
+
+  // ===== USEEFFECT PARA GARANTIR QUE O VÍDEO NÃO RODE AUTOMATICAMENTE =====
+  useEffect(() => {
+    const video = videoRef.current
+    if (video) {
+      // Garantir que o vídeo esteja pausado e na posição inicial
+      video.pause()
+      video.currentTime = 0
+      video.muted = true
+      video.volume = 0
+    }
+  }, [])
 
   const handleVideoClick = async () => {
-    console.log('handleVideoClick chamado!')
+    console.log('🎬 handleVideoClick chamado!')
     const video = videoRef.current
     if (!video) {
       console.error('❌ videoRef não encontrado')
@@ -97,9 +141,15 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
           })
         }
         
-        // Configurar áudio obrigatório
+        // IMPORTANTE: Permitir áudio para melhor experiência do usuário
         video.muted = false
-        video.volume = 1
+        video.volume = 0.7
+        
+        console.log('🎵 Configurações de áudio:', {
+          muted: video.muted,
+          volume: video.volume,
+          readyState: video.readyState
+        })
         
         // Tentar reproduzir
         await video.play()
@@ -115,12 +165,18 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
       } catch (err) {
         console.error("❌ Falha ao iniciar vídeo:", err)
         
-        // Fallback: tentar com áudio mudo (mais compatível)
+        // Fallback: tentar com áudio mudo para compatibilidade
         try {
           console.log('🔄 Tentando fallback com áudio mudo...')
           video.muted = true
+          video.volume = 0
+          video.playsInline = true
+          
+          // Aguardar um pouco antes de tentar novamente
+          await new Promise(resolve => setTimeout(resolve, 100))
+          
           await video.play()
-          console.log('✅ Vídeo iniciado com fallback!')
+          console.log('✅ Vídeo iniciado com fallback (áudio mudo)!')
           setIsPlaying(true)
           
           setShowOnGoingVideo(true)
@@ -131,6 +187,9 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
         } catch (fallbackErr) {
           console.error("❌ Fallback também falhou:", fallbackErr)
           setIsPlaying(false)
+          
+          // Mostrar mensagem de erro para o usuário
+          alert('Erro ao reproduzir vídeo. Tente recarregar a página.')
         }
       }
     } else {
@@ -169,10 +228,18 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
           disablePictureInPicture
           disableRemotePlayback
           crossOrigin="anonymous"
+          muted
+          webkit-playsinline="true"
+          x5-playsinline="true"
+          x5-video-player-type="h5"
+          x5-video-player-fullscreen="false"
+          // ===== OTIMIZAÇÕES DE PERFORMANCE =====
+          width={384}
+          height={682}
         >
-          {/* Usar Vercel Storage sempre */}
+          {/* Usar API de proxy para Vercel Blob Storage */}
           <source 
-            src={process.env.NEXT_PUBLIC_VIDEO_URL || 'https://n5c9lgm3cwpfoiun.public.blob.vercel-storage.com/video-de-vendas.mp4'} 
+            src="/api/video-proxy" 
             type="video/mp4" 
           />
           Seu navegador não suporta vídeos.
@@ -210,7 +277,7 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
               </div>
               
               {/* Texto "Clique para assistir" */}
-              <p className="text-lg font-medium text-white">
+              <p className="text-body font-medium text-white">
                 Clique para assistir
               </p>
             </div>
@@ -229,7 +296,7 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
             <div className="bg-black/70 backdrop-blur-md rounded-full px-3 py-2 border border-white/30 shadow-lg">
               <div className="flex items-center gap-2 text-white">
                 <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-xs font-medium">Reproduzindo</span>
+                <span className="text-small font-medium">Reproduzindo</span>
               </div>
             </div>
           </motion.div>
@@ -253,8 +320,6 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
         )}
       </div>
 
-
-
       {/* CTA Button - Sempre visível na versão 1, com delays na versão 2 */}
       {(version === "1" || showCTA) && (
         <motion.div
@@ -265,7 +330,7 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
         >
           <Link
             href="/strategy-call"
-            className="btn-minimal px-8 py-4 text-lg font-medium text-center min-w-[280px] max-w-md"
+            className="btn-minimal px-8 py-4 text-body font-medium text-center min-w-[280px] max-w-md"
           >
             AGENDAR SESSÃO ESTRATÉGICA
           </Link>

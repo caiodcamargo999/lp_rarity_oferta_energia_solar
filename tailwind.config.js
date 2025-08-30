@@ -7,94 +7,124 @@ module.exports = {
   ],
   theme: {
     extend: {
+      // ===== TIPOGRAFIA DESIGNERFLIX =====
+      fontFamily: {
+        'inter': ['Inter', 'Inter Placeholder', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Arial', 'sans-serif'],
+        'sans': ['Inter', 'Inter Placeholder', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Arial', 'sans-serif'],
+      },
+      fontSize: {
+        // Escala fluida baseada no Designerflix
+        'h1': ['clamp(2.25rem, 2vw + 1rem, 3rem)', {
+          lineHeight: '120%',
+          letterSpacing: '-0.04em',
+          fontWeight: '700',
+        }],
+        'h2': ['clamp(1.8rem, 1.5vw + 1rem, 2.6rem)', {
+          lineHeight: '120%',
+          letterSpacing: '-0.04em',
+          fontWeight: '600',
+        }],
+        'h3': ['clamp(1.5rem, 1.2vw + 1rem, 2rem)', {
+          lineHeight: '120%',
+          letterSpacing: '-0.04em',
+          fontWeight: '600',
+        }],
+        'h4': ['clamp(1.25rem, 1vw + 1rem, 1.63rem)', {
+          lineHeight: '120%',
+          letterSpacing: '-0.04em',
+          fontWeight: '600',
+        }],
+        'h5': ['clamp(1.125rem, 0.8vw + 1rem, 1.25rem)', {
+          lineHeight: '120%',
+          letterSpacing: '-0.04em',
+          fontWeight: '600',
+        }],
+        'h6': ['clamp(1rem, 0.6vw + 1rem, 1.125rem)', {
+          lineHeight: '120%',
+          letterSpacing: '-0.04em',
+          fontWeight: '600',
+        }],
+        'body': ['clamp(0.95rem, 0.4vw + 1rem, 1rem)', {
+          lineHeight: '140%',
+          letterSpacing: '-0.03em',
+          fontWeight: '500',
+        }],
+        'small': ['clamp(0.875rem, 0.3vw + 1rem, 0.9rem)', {
+          lineHeight: '140%',
+          letterSpacing: '-0.03em',
+          fontWeight: '500',
+        }],
+        'overline': ['clamp(0.75rem, 0.2vw + 1rem, 0.8rem)', {
+          lineHeight: '120%',
+          letterSpacing: '0.05em',
+          fontWeight: '500',
+        }],
+      },
+      
+      // ===== CORES EXISTENTES DA PÁGINA (NÃO ALTERADAS) =====
       colors: {
         primary: {
-          50: '#faf5ff',
-          100: '#f3e8ff',
-          200: '#e9d5ff',
-          300: '#d8b4fe',
-          400: '#c084fc',
           500: '#A855F7', // Roxo mais claro para melhor contraste
           600: '#9333EA', // Roxo mais claro para hover
-          700: '#7C3AED',
-          800: '#6B21A8',
-          900: '#581C87',
         },
         secondary: {
-          50: '#fdf4ff',
-          100: '#fae8ff',
-          200: '#f5d0fe',
-          300: '#f0abfc',
-          400: '#e879f9',
-          500: '#C084FC', // Roxo claro mais suave
-          600: '#c026d3',
-          700: '#a21caf',
-          800: '#86198f',
-          900: '#701a75',
-        },
-        dark: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0a0a0a', // Base dark from design rules
+          500: '#E879F9', // Roxo claro mais suave
         },
         text: {
           primary: '#FFFFFF', // Branco puro para máximo contraste
           secondary: '#D1D5DB', // Cinza mais claro para melhor legibilidade
-        }
-      },
-      fontFamily: {
-        poppins: ['Poppins', 'sans-serif'],
-      },
-      fontSize: {
-        '2.2': '2.2rem',
-        '2.5': '2.5rem',
-      },
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-        'gradient-dark': 'linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 25%, #2a0a2a 50%, #1a0a1a 75%, #0a0a0a 100%)',
-      },
-      animation: {
-        'fade-in': 'fadeIn 1s ease-out',
-        'fade-in-down': 'fadeInDown 1s ease-out',
-        'fade-in-up': 'fadeInUp 1s ease-out',
-        'fade-in-up-slow': 'fadeInUp 1.5s ease-out',
-        'fade-in-up-slower': 'fadeInUp 2s ease-out',
-      },
-      keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
         },
-        fadeInDown: {
-          '0%': { opacity: '0', transform: 'translateY(-20px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        fadeInUp: {
-          '0%': { opacity: '0', transform: 'translateY(20px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
+        background: {
+          start: 'rgb(10, 10, 10)',
+          end: 'rgb(42, 10, 42)',
         },
       },
+      
+      // ===== ESPAÇAMENTO DESIGNERFLIX =====
       spacing: {
-        '0.2': '0.2rem',
-        '0.3': '0.3rem',
-        '0.5': '0.5rem',
+        'xs': '0.25rem',   // 4px
+        'sm': '0.5rem',    // 8px
+        'md': '1rem',      // 16px
+        'lg': '1.5rem',    // 24px
+        'xl': '2rem',      // 32px
+        '2xl': '3rem',     // 48px
+        '3xl': '4rem',     // 64px
       },
+      
+      // ===== BORDER RADIUS DESIGNERFLIX =====
       borderRadius: {
-        '50': '50px',
+        'sm': '7px',
+        'md': '10px',
+        'lg': '16px',
+        'xl': '24px',
       },
-              boxShadow: {
-          'cta': '0 4px 20px rgba(0, 0, 0, 0.4)',
-          'cta-hover': '0 8px 30px rgba(168, 85, 247, 0.5)',
-          'card-hover': '0 10px 30px rgba(168, 85, 247, 0.2)',
-        },
+      
+      // ===== SOMBRAS DESIGNERFLIX =====
+      boxShadow: {
+        'designerflix': '0px 8px 40px 0px rgba(168, 85, 247, 0.5)',
+        'designerflix-hover': '0px 12px 50px 0px rgba(168, 85, 247, 0.6)',
+      },
+      
+      // ===== ANIMAÇÕES DESIGNERFLIX =====
+      animation: {
+        'fade-in-up': 'fadeInUp 0.6s ease-out',
+        'fade-in-down': 'fadeInDown 0.6s ease-out',
+        'scale-in': 'scaleIn 0.3s ease-out',
+      },
+      
+      // ===== TRANSITIONS DESIGNERFLIX =====
+      transitionDuration: {
+        'fast': '150ms',
+        'normal': '300ms',
+        'slow': '500ms',
+      },
+      
+      // ===== EASING DESIGNERFLIX =====
+      transitionTimingFunction: {
+        'ease-out': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'ease-in': 'cubic-bezier(0.4, 0, 1, 1)',
+        'ease-in-out': 'cubic-bezier(0.4, 0, 0.2, 1)',
+      },
     },
   },
   plugins: [],
