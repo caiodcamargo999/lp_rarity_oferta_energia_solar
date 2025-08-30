@@ -156,11 +156,7 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
         console.log('✅ Vídeo iniciado com sucesso!')
         setIsPlaying(true)
         
-        // Mostrar símbolo "on going video" por 2 segundos
-        setShowOnGoingVideo(true)
-        setTimeout(() => {
-          setShowOnGoingVideo(false)
-        }, 2000)
+        // ===== SÍMBOLO "REPRODUZINDO" REMOVIDO =====
         
       } catch (err) {
         console.error("❌ Falha ao iniciar vídeo:", err)
@@ -179,10 +175,7 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
           console.log('✅ Vídeo iniciado com fallback (áudio mudo)!')
           setIsPlaying(true)
           
-          setShowOnGoingVideo(true)
-          setTimeout(() => {
-            setShowOnGoingVideo(false)
-          }, 2000)
+          // ===== SÍMBOLO "REPRODUZINDO" REMOVIDO =====
           
         } catch (fallbackErr) {
           console.error("❌ Fallback também falhou:", fallbackErr)
@@ -193,9 +186,18 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
         }
       }
     } else {
-      console.log('⏸️ Pausando vídeo...')
-      video.pause()
-      setIsPlaying(false)
+      // ===== PAUSAR VÍDEO - CORRIGIDO =====
+      try {
+        console.log('⏸️ Pausando vídeo...')
+        video.pause()
+        setIsPlaying(false)
+        console.log('✅ Vídeo pausado com sucesso!')
+      } catch (error) {
+        console.error('❌ Erro ao pausar vídeo:', error)
+        // Forçar pausa mesmo com erro
+        video.pause()
+        setIsPlaying(false)
+      }
     }
   }
 
@@ -289,23 +291,7 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
           </div>
         )}
 
-        {/* Símbolo "On Going Video" - Aparece por 2 segundos após clicar play */}
-        {showOnGoingVideo && (
-          <motion.div
-            className="absolute top-4 right-4 z-20"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="bg-black/70 backdrop-blur-md rounded-full px-3 py-2 border border-white/30 shadow-lg">
-              <div className="flex items-center gap-2 text-white">
-                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-small font-medium">Reproduzindo</span>
-              </div>
-            </div>
-          </motion.div>
-        )}
+        {/* Símbolo "On Going Video" - REMOVIDO COMPLETAMENTE */}
 
         {isPlaying && (
           <div
@@ -323,13 +309,7 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
               </svg>
             </div>
             
-            {/* ===== INDICADOR DE PAUSA ===== */}
-            <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-md rounded-full px-3 py-2 border border-white/30 shadow-lg">
-              <div className="flex items-center gap-2 text-white">
-                <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
-                <span className="text-small font-medium">Clique para pausar</span>
-              </div>
-            </div>
+            {/* ===== INDICADOR DE PAUSA - REMOVIDO ===== */}
           </div>
         )}
       </div>

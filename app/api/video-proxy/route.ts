@@ -28,10 +28,16 @@ export async function GET(request: NextRequest) {
         'Accept': 'video/mp4,video/*;q=0.9,*/*;q=0.8',
         'Accept-Encoding': 'identity',
         'Connection': 'keep-alive',
+        // ===== HEADERS PARA REDUZIR TRAVAMENTOS =====
+        'X-Requested-With': 'XMLHttpRequest',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-origin',
       },
       // ===== CONFIGURAÇÕES DE PERFORMANCE =====
       cache: 'force-cache',
       next: { revalidate: 31536000 }, // Cache por 1 ano
+      // ===== TIMEOUT PARA EVITAR TRAVAMENTOS =====
+      signal: AbortSignal.timeout(30000), // 30 segundos timeout
     })
 
     if (!response.ok) {
