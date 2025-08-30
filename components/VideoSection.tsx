@@ -14,7 +14,6 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
   const [showCTA, setShowCTA] = useState(false)
   const [showUrgency, setShowUrgency] = useState(false)
   const [showOnGoingVideo, setShowOnGoingVideo] = useState(false)
-  const [isMuted, setIsMuted] = useState(true)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
@@ -82,9 +81,8 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
     if (video.paused) {
       try {
         console.log('▶️ Tentando iniciar vídeo...')
-        // Primeiro tenta com som
+        // Áudio obrigatório - sempre ativo
         video.muted = false
-        setIsMuted(false)
         await video.play()
         console.log('✅ Vídeo iniciado com sucesso!')
         setIsPlaying(true)
@@ -96,39 +94,13 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
         }, 2000)
         
       } catch (err) {
-        console.error("❌ Falha ao iniciar vídeo com som:", err)
-        // Fallback: tenta mutado
-        try {
-          video.muted = true
-          setIsMuted(true)
-          await video.play()
-          console.log("✅ Vídeo iniciado no modo mudo como fallback.")
-          setIsPlaying(true)
-          
-          // Mostrar símbolo "on going video" por 2 segundos
-          setShowOnGoingVideo(true)
-          setTimeout(() => {
-            setShowOnGoingVideo(false)
-          }, 2000)
-          
-        } catch (fallbackErr) {
-          console.error("❌ Falha ao iniciar vídeo no modo mudo:", fallbackErr)
-          setIsPlaying(false)
-        }
+        console.error("❌ Falha ao iniciar vídeo:", err)
+        setIsPlaying(false)
       }
     } else {
       console.log('⏸️ Pausando vídeo...')
       video.pause()
       setIsPlaying(false)
-    }
-  }
-
-  const unmuteVideo = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    const video = videoRef.current
-    if (video) {
-      video.muted = false
-      setIsMuted(false)
     }
   }
 
@@ -154,7 +126,7 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
           className="w-full aspect-[9/16] object-cover rounded-2xl shadow-2xl cursor-pointer"
           playsInline
           loop
-          muted
+          poster="/thumbmail_vsl.png"
           onClick={handleVideoClick}
         >
           <source src="/video-de-vendas.mp4" type="video/mp4" />
@@ -226,21 +198,6 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
               </div>
             </div>
           </motion.div>
-        )}
-
-        {isPlaying && isMuted && (
-          <div className="absolute top-4 right-4 z-30">
-            <button
-              onClick={unmuteVideo}
-              className="bg-black/60 hover:bg-black/80 text-white p-2 rounded-full transition-all duration-200 backdrop-blur-sm border border-white/20"
-              title="Ativar som"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-              </svg>
-            </button>
-          </div>
         )}
 
         {isPlaying && (

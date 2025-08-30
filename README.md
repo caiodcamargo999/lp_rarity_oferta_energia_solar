@@ -20,7 +20,7 @@ Uma landing page moderna e de alta performance para a Rarity Agency - Growth for
 - 🎬 **Botão de Play Circular** escuro com texto "Clique para assistir"
 - 🎯 **Clique em qualquer parte do vídeo** inicia a reprodução
 - ⏱️ **Símbolo "on going video"** aparece por 2 segundos após clicar play
-- 🔊 **Controles de áudio** com botão de unmute
+- 🖼️ **Thumbnail inicial** exibido antes da reprodução
 - 🎭 **Animações suaves** com Framer Motion
 
 ## 🛠️ **Stack Tecnológica**
