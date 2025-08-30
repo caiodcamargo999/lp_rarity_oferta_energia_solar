@@ -40,12 +40,16 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
     }
 
     const handleLoadedData = () => {
-      console.log('Vídeo carregado com sucesso!', {
+      console.log('✅ Vídeo carregado com sucesso!', {
         duration: video.duration,
         readyState: video.readyState,
         videoWidth: video.videoWidth,
         videoHeight: video.videoHeight
       })
+    }
+
+    const handleCanPlay = () => {
+      console.log('🎬 Vídeo pronto para reprodução!')
     }
 
     const handleError = (e: Event) => {
@@ -54,37 +58,52 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
 
     video.addEventListener('timeupdate', handleTimeUpdate)
     video.addEventListener('loadeddata', handleLoadedData)
+    video.addEventListener('canplay', handleCanPlay)
     video.addEventListener('error', handleError)
 
     return () => {
       video.removeEventListener('timeupdate', handleTimeUpdate)
       video.removeEventListener('loadeddata', handleLoadedData)
+      video.removeEventListener('canplay', handleCanPlay)
       video.removeEventListener('error', handleError)
     }
   }, [onTimeUpdate, showCTA, showUrgency, version])
 
   const handleVideoClick = async () => {
-    console.log('handleVideoClick chamado!')
+    console.log('🎯 handleVideoClick chamado!')
     const video = videoRef.current
     if (!video) {
-      console.error('videoRef não encontrado')
+      console.error('❌ videoRef não encontrado')
       return
     }
 
-    console.log('Estado atual do vídeo:', {
+    console.log('📊 Estado atual do vídeo:', {
       paused: video.paused,
       currentTime: video.currentTime,
       duration: video.duration,
-      readyState: video.readyState
+      readyState: video.readyState,
+      networkState: video.networkState
     })
 
     if (video.paused) {
       try {
-        console.log('Tentando iniciar vídeo...')
-        // Áudio obrigatório - sempre ativo
+        console.log('▶️ Tentando iniciar vídeo...')
+        
+        // Garantir que o vídeo está pronto
+        if (video.readyState < 2) {
+          console.log('⏳ Vídeo ainda não está pronto, aguardando...')
+          await new Promise(resolve => {
+            video.addEventListener('canplay', resolve, { once: true })
+          })
+        }
+        
+        // Configurar áudio obrigatório
         video.muted = false
+        video.volume = 1
+        
+        // Tentar reproduzir
         await video.play()
-        console.log('Vídeo iniciado com sucesso!')
+        console.log('✅ Vídeo iniciado com sucesso!')
         setIsPlaying(true)
         
         // Mostrar símbolo "on going video" por 2 segundos
@@ -94,8 +113,25 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
         }, 2000)
         
       } catch (err) {
-        console.error("Falha ao iniciar vídeo:", err)
-        setIsPlaying(false)
+        console.error("❌ Falha ao iniciar vídeo:", err)
+        
+        // Fallback: tentar com áudio mudo (mais compatível)
+        try {
+          console.log('🔄 Tentando fallback com áudio mudo...')
+          video.muted = true
+          await video.play()
+          console.log('✅ Vídeo iniciado com fallback!')
+          setIsPlaying(true)
+          
+          setShowOnGoingVideo(true)
+          setTimeout(() => {
+            setShowOnGoingVideo(false)
+          }, 2000)
+          
+        } catch (fallbackErr) {
+          console.error("❌ Fallback também falhou:", fallbackErr)
+          setIsPlaying(false)
+        }
       }
     } else {
       console.log('⏸️ Pausando vídeo...')
@@ -120,7 +156,7 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
         </p>
       </div>
 
-      <div className="relative group">
+      <div className="relative group" onClick={handleVideoClick}>
         <video
           ref={videoRef}
           className="w-full aspect-[9/16] object-cover rounded-2xl shadow-2xl cursor-pointer"
@@ -129,6 +165,10 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
           poster="/thumbmail_vsl.png"
           preload="metadata"
           onClick={handleVideoClick}
+          controls={false}
+          disablePictureInPicture
+          disableRemotePlayback
+          crossOrigin="anonymous"
         >
           {/* Usar Vercel Storage em produção, arquivo local em desenvolvimento */}
           <source 
@@ -183,26 +223,16 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
         {/* Símbolo "On Going Video" - Aparece por 2 segundos após clicar play */}
         {showOnGoingVideo && (
           <motion.div
-            className="absolute inset-0 flex items-center justify-center z-20"
+            className="absolute top-4 right-4 z-20"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="bg-black/80 backdrop-blur-md rounded-full p-6 border border-white/30 shadow-2xl">
-              <div className="text-center text-white">
-                <div className="w-16 h-16 mx-auto mb-3">
-                  <div className="w-full h-full rounded-full bg-white/20 flex items-center justify-center">
-                    <svg
-                      className="w-8 h-8 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                    </svg>
-                  </div>
-                </div>
-                <p className="text-sm font-medium">Reproduzindo...</p>
+            <div className="bg-black/70 backdrop-blur-md rounded-full px-3 py-2 border border-white/30 shadow-lg">
+              <div className="flex items-center gap-2 text-white">
+                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-xs font-medium">Reproduzindo</span>
               </div>
             </div>
           </motion.div>
