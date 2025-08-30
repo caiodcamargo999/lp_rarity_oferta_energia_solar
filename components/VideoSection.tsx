@@ -170,12 +170,9 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
           disableRemotePlayback
           crossOrigin="anonymous"
         >
-          {/* Usar Vercel Storage em produção, arquivo local em desenvolvimento */}
+          {/* Usar Vercel Storage sempre */}
           <source 
-            src={process.env.NODE_ENV === 'production' 
-              ? process.env.NEXT_PUBLIC_VIDEO_URL || '/video-de-vendas.mp4'
-              : '/video-de-vendas.mp4'
-            } 
+            src={process.env.NEXT_PUBLIC_VIDEO_URL || 'https://n5c9lgm3cwpfoiun.public.blob.vercel-storage.com/video-de-vendas.mp4'} 
             type="video/mp4" 
           />
           Seu navegador não suporta vídeos.
