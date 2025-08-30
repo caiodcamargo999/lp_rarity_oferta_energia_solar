@@ -3,22 +3,11 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Suspense } from 'react'
-import dynamic from 'next/dynamic'
-
-// Dynamic imports for better performance
-const VideoSection = dynamic(() => import('@/components/VideoSection'), {
-  loading: () => <div className="w-full h-48 bg-gray-800 animate-pulse rounded-lg" />,
-  ssr: false
-})
-
-const SuccessCases = dynamic(() => import('@/components/SuccessCases'), {
-  loading: () => <div className="w-full h-64 bg-gray-800 animate-pulse rounded-lg" />,
-  ssr: false
-})
+import VideoSection from '../components/VideoSection'
+import SuccessCases from '../components/SuccessCases'
 
 export default function HomePage() {
-  // O VideoSection agora gerencia internamente o timing dos elementos
+  // Página raiz (/) - Todas as seções aparecem desde o começo
 
   return (
     <main className="min-h-screen w-full">
@@ -59,36 +48,16 @@ export default function HomePage() {
           <p className="text-lg md:text-xl text-text-secondary mb-8 max-w-3xl mx-auto leading-relaxed">
             <strong className="text-text-primary">Empresas de energia solar</strong> estão perdendo milhões em vendas por não usar <span className="gradient-text">IA + Anúncios Online</span>. 
             <br/><br/>
-            Nós implementamos sistemas que <strong className="text-text-primary">automatizam 80% do processo de vendas</strong> e multiplicam seus resultados usando estratégias comprovadas de <span className="gradient-text">copywriting persuasivo</span>, <span className="text-text-primary">automação inteligente</span> e <span className="gradient-text">anúncios online em escala</span>.
+            Nós implementamos sistemas que <strong className="text-text-primary">automatizam 80% do processo de vendas</strong> e multiplicam seus resultados usando estratégias comprovadas de <span className="gradient-text">copywriting persuasivo</span>, <span className="text-primary">automação inteligente</span> e <span className="gradient-text">anúncios online em escala</span>.
           </p>
         </div>
       </motion.section>
 
-      {/* Video Section - Now using dynamic import for better performance */}
-      <Suspense fallback={
-        <div className="px-4 mb-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="w-full h-48 bg-gray-800 animate-pulse rounded-lg"></div>
-          </div>
-        </div>
-      }>
-        <VideoSection />
-      </Suspense>
+      {/* Video Section - Versão sem delays */}
+      <VideoSection version="1" />
 
-      {/* CTA Button - Agora é exibido diretamente no VideoSection após 1:20 de vídeo */}
-
-      {/* Success Cases Section - Now using dynamic import for better performance */}
-      <Suspense fallback={
-        <div className="px-4 mb-12">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="w-full h-64 bg-gray-800 animate-pulse rounded-lg"></div>
-          </div>
-        </div>
-      }>
-        <SuccessCases />
-      </Suspense>
-
-      {/* Urgency Section - Agora é exibida diretamente no VideoSection após 1:00 de vídeo */}
+      {/* Success Cases Section */}
+      <SuccessCases version="1" />
 
       {/* Footer */}
       <footer className="text-center py-8 border-t border-white/10">
@@ -97,23 +66,23 @@ export default function HomePage() {
             Transforme sua empresa de energia solar em uma máquina de vendas
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-            <Link 
+            <a 
               href="https://rarityagency.io" 
               className="text-primary-500 hover:text-primary-400 transition-colors"
               target="_blank"
               rel="noopener noreferrer"
             >
               Visit rarityagency.io
-            </Link>
+            </a>
             <span className="text-text-secondary">|</span>
-            <Link 
+            <a 
               href="https://www.instagram.com/rarity.brasil/" 
               className="text-primary-500 hover:text-primary-400 transition-colors"
               target="_blank"
               rel="noopener noreferrer"
             >
               Follow @rarity.brasil
-            </Link>
+            </a>
           </div>
           <p className="text-text-secondary text-sm">
             Rarity Agency © 2025 | Especialistas em Marketing Digital para Energia Solar

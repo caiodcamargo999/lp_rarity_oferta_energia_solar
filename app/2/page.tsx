@@ -3,19 +3,8 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Suspense } from 'react'
-import dynamic from 'next/dynamic'
-
-// Dynamic imports for better performance
-const VideoSection = dynamic(() => import('@/components/VideoSection'), {
-  loading: () => <div className="w-full h-48 bg-gray-800 animate-pulse rounded-lg" />,
-  ssr: false
-})
-
-const SuccessCases = dynamic(() => import('@/components/SuccessCases'), {
-  loading: () => <div className="w-full h-64 bg-gray-800 animate-pulse rounded-lg" />,
-  ssr: false
-})
+import VideoSection from '../../components/VideoSection'
+import SuccessCases from '../../components/SuccessCases'
 
 export default function HomePageV2() {
   // Versão /2: Com delays solicitados
@@ -65,26 +54,10 @@ export default function HomePageV2() {
       </motion.section>
 
       {/* Video Section - Versão com delays */}
-      <Suspense fallback={
-        <div className="px-4 mb-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="w-full h-48 bg-gray-800 animate-pulse rounded-lg"></div>
-          </div>
-        </div>
-      }>
-        <VideoSection version="2" />
-      </Suspense>
+      <VideoSection version="2" />
 
       {/* Success Cases Section */}
-      <Suspense fallback={
-        <div className="px-4 mb-12">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="w-full h-64 bg-gray-800 animate-pulse rounded-lg"></div>
-          </div>
-        </div>
-      }>
-        <SuccessCases />
-      </Suspense>
+      <SuccessCases version="2" />
 
       {/* Footer */}
       <footer className="text-center py-8 border-t border-white/10">
@@ -93,23 +66,23 @@ export default function HomePageV2() {
             Transforme sua empresa de energia solar em uma máquina de vendas
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-            <Link 
+            <a 
               href="https://rarityagency.io" 
               className="text-primary-500 hover:text-primary-400 transition-colors"
               target="_blank"
               rel="noopener noreferrer"
             >
               Visit rarityagency.io
-            </Link>
+            </a>
             <span className="text-text-secondary">|</span>
-            <Link 
+            <a 
               href="https://www.instagram.com/rarity.brasil/" 
               className="text-primary-500 hover:text-primary-400 transition-colors"
               target="_blank"
               rel="noopener noreferrer"
             >
               Follow @rarity.brasil
-            </Link>
+            </a>
           </div>
           <p className="text-text-secondary text-sm">
             Rarity Agency © 2025 | Especialistas em Marketing Digital para Energia Solar

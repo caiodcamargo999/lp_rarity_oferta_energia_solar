@@ -4,13 +4,13 @@ Uma landing page moderna e de alta performance para a Rarity Agency - Growth for
 
 ## 🚀 **Funcionalidades Implementadas**
 
-### **Versão 1 (/)** - Todas as Seções Visíveis
+### **Versão /1 - Todas as Seções Visíveis**
 - ✅ **Seção de Urgência** aparece desde o começo
 - ✅ **CTA Button** aparece desde o começo
 - ✅ **Casos de Sucesso** sempre visíveis
 - ✅ **Design responsivo** e otimizado
 
-### **Versão 2 (/2)** - Com Delays e Timing
+### **Versão /2 - Com Delays e Timing**
 - ✅ **Seção de Urgência** aparece após 1:00 de vídeo
 - ✅ **CTA Button** aparece após 1:20 de vídeo
 - ✅ **Timing controlado** para máxima conversão
@@ -36,8 +36,10 @@ Uma landing page moderna e de alta performance para a Rarity Agency - Growth for
 
 ### **Navegação entre Versões**
 1. **Acesse** `/navigation` para escolher entre as versões
-2. **Versão 1**: `/` - Todas as seções visíveis
-3. **Versão 2**: `/2` - Com delays e timing controlado
+2. **Versão /1**: Todas as seções visíveis desde o começo
+3. **Versão /2**: Com delays e timing controlado
+
+**Nota**: A raiz (/) redireciona automaticamente para `/1`
 
 ### **Funcionalidades de Vídeo**
 1. **Clique no botão de play** ou em qualquer parte do vídeo

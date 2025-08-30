@@ -35,7 +35,7 @@ export default function NavigationPage() {
               href="/"
               className="block bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white font-bold py-6 px-12 rounded-2xl text-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg"
             >
-              🚀 Versão 1 - Todas as Seções Visíveis
+              Versão Raiz (/) - Todas as Seções Visíveis
             </Link>
             <p className="text-text-secondary mt-3">
               Seção de urgência e CTA aparecem desde o começo
@@ -51,7 +51,7 @@ export default function NavigationPage() {
               href="/2"
               className="block bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-bold py-6 px-12 rounded-2xl text-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg"
             >
-              ⏰ Versão 2 - Com Delays e Timing
+              Versão /2 - Com Delays e Timing
             </Link>
             <p className="text-text-secondary mt-3">
               Seções aparecem após 1:00 e 1:20 de vídeo

@@ -40,7 +40,7 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
     }
 
     const handleLoadedData = () => {
-      console.log('🎥 Vídeo carregado com sucesso!', {
+      console.log('Vídeo carregado com sucesso!', {
         duration: video.duration,
         readyState: video.readyState,
         videoWidth: video.videoWidth,
@@ -49,7 +49,7 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
     }
 
     const handleError = (e: Event) => {
-      console.error('❌ Erro ao carregar vídeo:', e)
+      console.error('Erro ao carregar vídeo:', e)
     }
 
     video.addEventListener('timeupdate', handleTimeUpdate)
@@ -64,14 +64,14 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
   }, [onTimeUpdate, showCTA, showUrgency, version])
 
   const handleVideoClick = async () => {
-    console.log('🎬 handleVideoClick chamado!')
+    console.log('handleVideoClick chamado!')
     const video = videoRef.current
     if (!video) {
-      console.error('❌ videoRef não encontrado')
+      console.error('videoRef não encontrado')
       return
     }
 
-    console.log('📹 Estado atual do vídeo:', {
+    console.log('Estado atual do vídeo:', {
       paused: video.paused,
       currentTime: video.currentTime,
       duration: video.duration,
@@ -80,11 +80,11 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
 
     if (video.paused) {
       try {
-        console.log('▶️ Tentando iniciar vídeo...')
+        console.log('Tentando iniciar vídeo...')
         // Áudio obrigatório - sempre ativo
         video.muted = false
         await video.play()
-        console.log('✅ Vídeo iniciado com sucesso!')
+        console.log('Vídeo iniciado com sucesso!')
         setIsPlaying(true)
         
         // Mostrar símbolo "on going video" por 2 segundos
@@ -94,7 +94,7 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
         }, 2000)
         
       } catch (err) {
-        console.error("❌ Falha ao iniciar vídeo:", err)
+        console.error("Falha ao iniciar vídeo:", err)
         setIsPlaying(false)
       }
     } else {
@@ -127,9 +127,17 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
           playsInline
           loop
           poster="/thumbmail_vsl.png"
+          preload="metadata"
           onClick={handleVideoClick}
         >
-          <source src="/video-de-vendas.mp4" type="video/mp4" />
+          {/* Usar Vercel Storage em produção, arquivo local em desenvolvimento */}
+          <source 
+            src={process.env.NODE_ENV === 'production' 
+              ? process.env.NEXT_PUBLIC_VIDEO_URL || '/video-de-vendas.mp4'
+              : '/video-de-vendas.mp4'
+            } 
+            type="video/mp4" 
+          />
           Seu navegador não suporta vídeos.
         </video>
 
@@ -218,45 +226,21 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
         )}
       </div>
 
-      {/* Seção de Urgência - Apenas na versão 2 com delays */}
-      {version === "2" && showUrgency && (
-        <motion.div
-          className="mt-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        >
-          <div className="bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/30 rounded-2xl p-6 backdrop-blur-sm">
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-4">
-                <span className="text-3xl mr-3">⏰</span>
-                <h3 className="text-xl font-bold text-red-400">
-                  URGENTE: Oportunidade Limitada
-                </h3>
-              </div>
-              <p className="text-text-secondary mb-4">
-                <strong className="text-red-400">Apenas 3 empresas</strong> serão selecionadas para implementar nosso sistema este mês.
-                <br />
-                <span className="text-red-300 font-semibold">Quem implementar primeiro, vende primeiro!</span>
-              </p>
-            </div>
-          </div>
-        </motion.div>
-      )}
 
-      {/* CTA Button - Apenas na versão 2 com delays */}
-      {version === "2" && showCTA && (
+
+      {/* CTA Button - Sempre visível na versão 1, com delays na versão 2 */}
+      {(version === "1" || showCTA) && (
         <motion.div
-          className="mt-6"
+          className="mt-6 flex justify-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           <Link
             href="/strategy-call"
-            className="btn-minimal px-8 py-4 text-lg font-medium w-full"
+            className="btn-minimal px-8 py-4 text-lg font-medium text-center min-w-[280px] max-w-md"
           >
-            Agendar Consultoria Gratuita
+            AGENDAR SESSÃO ESTRATÉGICA
           </Link>
         </motion.div>
       )}
