@@ -312,6 +312,7 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
             className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer rounded-2xl z-10"
             onClick={handleVideoClick}
           >
+            {/* ===== CONTROLES DE PAUSA MELHORADOS ===== */}
             <div className="w-16 h-16 bg-black/60 backdrop-blur-sm border border-white/30 rounded-full flex items-center justify-center hover:scale-110 transition-transform">
               <svg
                 className="w-8 h-8 text-white"
@@ -320,6 +321,14 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
               >
                 <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
               </svg>
+            </div>
+            
+            {/* ===== INDICADOR DE PAUSA ===== */}
+            <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-md rounded-full px-3 py-2 border border-white/30 shadow-lg">
+              <div className="flex items-center gap-2 text-white">
+                <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
+                <span className="text-small font-medium">Clique para pausar</span>
+              </div>
             </div>
           </div>
         )}

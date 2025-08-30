@@ -19,11 +19,15 @@ export async function GET(request: NextRequest) {
     const range = request.headers.get('range')
     const start = range ? parseInt(range.replace('bytes=', '').split('-')[0]) : 0
     
-    // Buscar o vídeo do Vercel Storage com range para streaming
+    // ===== CONFIGURAÇÕES OTIMIZADAS PARA STREAMING =====
     const response = await fetch(videoUrl, {
       headers: {
         'Range': range || 'bytes=0-',
         'Cache-Control': 'public, max-age=31536000, immutable',
+        // ===== HEADERS PARA MELHOR PERFORMANCE =====
+        'Accept': 'video/mp4,video/*;q=0.9,*/*;q=0.8',
+        'Accept-Encoding': 'identity',
+        'Connection': 'keep-alive',
       },
       // ===== CONFIGURAÇÕES DE PERFORMANCE =====
       cache: 'force-cache',
@@ -63,6 +67,10 @@ export async function GET(request: NextRequest) {
         ...(contentRange && { 'Content-Range': contentRange }),
         // ===== COMPRESSÃO =====
         'Vary': 'Accept-Encoding',
+        // ===== HEADERS PARA MELHOR PERFORMANCE =====
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY',
+        'X-XSS-Protection': '1; mode=block',
       },
     })
 
@@ -77,7 +85,11 @@ export async function GET(request: NextRequest) {
       const fallbackUrl = 'https://n5c9lgm3cwpfoiun.public.blob.vercel-storage.com/video-de-vendas.mp4'
       
       const fallbackResponse = await fetch(fallbackUrl, {
-        headers: { 'Range': request.headers.get('range') || 'bytes=0-' }
+        headers: { 
+          'Range': request.headers.get('range') || 'bytes=0-',
+          'Accept': 'video/mp4,video/*;q=0.9,*/*;q=0.8',
+          'Accept-Encoding': 'identity',
+        }
       })
       
       if (fallbackResponse.ok) {
@@ -90,6 +102,7 @@ export async function GET(request: NextRequest) {
             'Accept-Ranges': 'bytes',
             'Cache-Control': 'public, max-age=31536000, immutable',
             'Access-Control-Allow-Origin': '*',
+            'X-Content-Type-Options': 'nosniff',
           },
         })
       }
