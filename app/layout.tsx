@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Inter, Poppins } from 'next/font/google'
-import { ChakraProvider } from '@chakra-ui/react'
 import './globals.css'
 
 
@@ -94,10 +93,8 @@ export default function RootLayout({
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="theme-color" content="#8A2BE2" />
       </head>
-      <body className={`${poppins.variable} font-poppins`}>
-        <ChakraProvider>
-          {children}
-        </ChakraProvider>
+      <body className={`${poppins.variable} font-poppins bg-slate-900 min-h-screen`}>
+        {children}
       </body>
     </html>
   )

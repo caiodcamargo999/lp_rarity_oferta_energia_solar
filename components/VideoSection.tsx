@@ -70,7 +70,7 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
   }, [onTimeUpdate, showCTA, showUrgency, version])
 
   const handleVideoClick = async () => {
-    console.log('🎯 handleVideoClick chamado!')
+    console.log('handleVideoClick chamado!')
     const video = videoRef.current
     if (!video) {
       console.error('❌ videoRef não encontrado')
@@ -193,7 +193,7 @@ export default function VideoSection({ version = "1", onTimeUpdate }: VideoSecti
                 className="w-24 h-24 mx-auto mb-4 cursor-pointer hover:scale-105 transition-transform"
                 onClick={(e) => {
                   e.stopPropagation()
-                  console.log('🎯 Clique no botão de play!')
+                  console.log('Clique no botão de play!')
                   handleVideoClick()
                 }}
               >

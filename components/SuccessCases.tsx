@@ -113,7 +113,7 @@ export default function SuccessCases({ version = "1" }: SuccessCasesProps) {
                               <br /><br />
                               <span className="text-primary-300 font-semibold text-base md:text-lg">Regra simples: quem implementar primeiro, vende primeiro.</span>
                               <br /><br />
-                              <span className="text-text-primary">👉 Garanta sua vaga antes que outro ocupe o lugar.</span>
+                              <span className="text-text-primary">Garanta sua vaga antes que outro ocupe o lugar.</span>
                 </p>
                 
                 {/* Botão CTA na seção de urgência */}
