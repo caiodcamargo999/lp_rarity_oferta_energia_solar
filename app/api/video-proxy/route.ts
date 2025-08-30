@@ -2,7 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
   try {
+    // ===== DEBUG: VERIFICAR VARIÁVEIS DE AMBIENTE =====
+    console.log('🔍 Variáveis de ambiente:', {
+      NEXT_PUBLIC_VIDEO_URL: process.env.NEXT_PUBLIC_VIDEO_URL,
+      NODE_ENV: process.env.NODE_ENV,
+      VERCEL: process.env.VERCEL,
+      VERCEL_ENV: process.env.VERCEL_ENV
+    })
+    
+    // ===== URL DO VÍDEO - PRIORIDADE PARA VARIÁVEL DE AMBIENTE =====
     const videoUrl = process.env.NEXT_PUBLIC_VIDEO_URL || 'https://n5c9lgm3cwpfoiun.public.blob.vercel-storage.com/video-de-vendas.mp4'
+    
+    console.log('🎬 Tentando carregar vídeo de:', videoUrl)
     
     // ===== OTIMIZAÇÕES DE PERFORMANCE =====
     const range = request.headers.get('range')
@@ -20,8 +31,11 @@ export async function GET(request: NextRequest) {
     })
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch video: ${response.status}`)
+      console.error(`❌ Erro ao buscar vídeo: ${response.status} - ${response.statusText}`)
+      throw new Error(`Failed to fetch video: ${response.status} - ${response.statusText}`)
     }
+
+    console.log('✅ Vídeo carregado com sucesso! Status:', response.status)
 
     // Extrair headers importantes
     const contentLength = response.headers.get('content-length')
@@ -55,9 +69,40 @@ export async function GET(request: NextRequest) {
     return videoResponse
 
   } catch (error) {
-    console.error('Erro no proxy de vídeo:', error)
+    console.error('❌ Erro crítico no proxy de vídeo:', error)
+    
+    // ===== FALLBACK: TENTAR URL ALTERNATIVA =====
+    try {
+      console.log('🔄 Tentando URL alternativa...')
+      const fallbackUrl = 'https://n5c9lgm3cwpfoiun.public.blob.vercel-storage.com/video-de-vendas.mp4'
+      
+      const fallbackResponse = await fetch(fallbackUrl, {
+        headers: { 'Range': request.headers.get('range') || 'bytes=0-' }
+      })
+      
+      if (fallbackResponse.ok) {
+        console.log('✅ Fallback funcionou!')
+        return new NextResponse(fallbackResponse.body, {
+          status: fallbackResponse.status,
+          headers: {
+            'Content-Type': 'video/mp4',
+            'Content-Length': fallbackResponse.headers.get('content-length') || '',
+            'Accept-Ranges': 'bytes',
+            'Cache-Control': 'public, max-age=31536000, immutable',
+            'Access-Control-Allow-Origin': '*',
+          },
+        })
+      }
+    } catch (fallbackError) {
+      console.error('❌ Fallback também falhou:', fallbackError)
+    }
+    
     return NextResponse.json(
-      { error: 'Erro ao carregar vídeo' },
+      { 
+        error: 'Erro ao carregar vídeo',
+        details: error instanceof Error ? error.message : 'Erro desconhecido',
+        timestamp: new Date().toISOString()
+      },
       { status: 500 }
     )
   }

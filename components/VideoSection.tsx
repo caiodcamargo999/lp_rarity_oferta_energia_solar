@@ -237,9 +237,14 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
           width={384}
           height={682}
         >
-          {/* Usar API de proxy para Vercel Blob Storage */}
+          {/* ===== FALLBACK: TENTAR API PROXY PRIMEIRO, DEPOIS URL DIRETA ===== */}
           <source 
             src="/api/video-proxy" 
+            type="video/mp4" 
+          />
+          {/* ===== FALLBACK DIRETO PARA VERCEL STORAGE ===== */}
+          <source 
+            src="https://n5c9lgm3cwpfoiun.public.blob.vercel-storage.com/video-de-vendas.mp4" 
             type="video/mp4" 
           />
           Seu navegador não suporta vídeos.
