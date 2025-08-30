@@ -1,232 +1,313 @@
-# Rarity Agency Landing Page - Design Rules
+# Rarity Agency Landing Page - Regras de Design
 
-## 🎨 Design System Overview
+## 🚨 **REGRAS MÁXIMAS - NUNCA VIOLAR**
 
-### **Brand Identity**
-- **Company**: Rarity Agency
-- **Tagline**: "Growth for Startups"
-- **Value Proposition**: "Unlock Your Growth Engine"
-- **Industry**: Digital Marketing & Growth Agency
+### **REGRA MÁXIMA #1: COPY E DESIGN SAGRADOS**
+- ❌ **NUNCA** altere copy, textos, design ou layout sem autorização **EXPLÍCITA** do usuário
+- ❌ **NUNCA** mude cores, fontes, espaçamentos ou elementos visuais
+- ❌ **NUNCA** altere o conteúdo textual das seções
+- ❌ **NUNCA** modifique a estrutura visual da página
+- ✅ **SEMPRE** mantenha o design e copy exatamente como especificado
+- ✅ **SEMPRE** peça permissão antes de qualquer mudança visual/textual
+- ✅ **SEMPRE** implemente apenas funcionalidades técnicas solicitadas
 
 ---
 
-## 🎯 Layout Structure
+## 🚀 **Stack Tecnológica Atual**
 
-### **First Section (Above the Fold)**
-1. **Logo Area** (Red Rectangle)
-   - Large logo positioned at the top
-   - Size: 1200px max-width
-   - Minimal padding: 0.5rem
+### **Framework Principal**
+- **Next.js 14** (App Router) - Framework React para produção
+- **TypeScript** - Linguagem de programação tipada
+- **React 18** - Biblioteca de interface do usuário
+
+### **Estilização e UI**
+- **Tailwind CSS** - Framework CSS utilitário
+- **Framer Motion** - Biblioteca de animações
+- **CSS Customizado** - Estilos específicos do projeto
+
+### **Componentes e Bibliotecas**
+- **Lucide React** - Ícones SVG otimizados
+- **Dynamic Imports** - Carregamento lazy de componentes
+- **Suspense** - Gerenciamento de estados de carregamento
+
+### **Performance e Otimização**
+- **SWC Compiler** - Compilador rápido para Next.js
+- **Image Optimization** - Otimização automática de imagens
+- **Code Splitting** - Divisão automática de código
+- **Performance Monitoring** - Monitoramento de métricas Core Web Vitals
+
+---
+
+## 🎨 **Visão Geral do Sistema de Design**
+
+### **Identidade da Marca**
+- **Empresa**: Rarity Agency
+- **Tagline**: "Growth for Startups"
+- **Proposta de Valor**: "Unlock Your Growth Engine"
+- **Setor**: Marketing Digital & Agência de Crescimento
+
+---
+
+## 🎯 **Estrutura do Layout**
+
+### **Primeira Seção (Above the Fold)**
+1. **Área do Logo** (Retângulo Vermelho)
+   - Logo grande posicionado no topo
+   - Tamanho: 1200px max-width
+   - Padding mínimo: 0.5rem
    - Margin-bottom: 0.3rem
 
-2. **Headline & Subheadline** (Yellow Rectangle)
-   - Headline: "Unlock Your Growth Engine"
-   - Font size: 2.2rem
-   - Gradient text effect on "Growth Engine"
-   - Subheadline: Descriptive text about services
-   - Font size: 1rem
+2. **Headline & Subheadline** (Retângulo Amarelo)
+   - Headline: "DOBRE suas Vendas de Placas Solares"
+   - Tamanho da fonte: 2.2rem
+   - Efeito de texto gradiente em "DOBRE"
+   - Subheadline: Texto descritivo sobre serviços
+   - Tamanho da fonte: 1rem
    - Max-width: 500px
-   - Minimal spacing between elements
+   - Espaçamento mínimo entre elementos
 
-3. **Video Section** (Green Rectangle)
-   - Label: "SEE OUR APPROACH IN ACTION"
-   - Horizontal rectangle format (4:1 aspect ratio)
-   - Max-width: 900px
-   - Height: 200px
-   - Play button icon centered
+3. **Seção de Vídeo** (Retângulo Verde)
+   - Label: "ASSISTA COMO FUNCIONA"
+   - Formato vertical (aspect ratio 9:16)
+   - Max-width: 400px
+   - Botão de play circular centralizado
+   - **FUNCIONALIDADE**: Clique em qualquer parte do retângulo do vídeo deve iniciar a reprodução
 
-4. **Call-to-Action Button**
-   - Text: "Book a Free Strategy Call"
-   - Purple gradient background
-   - Rounded corners (50px border-radius)
-   - Hover effects with lift animation
+4. **Botão Call-to-Action**
+   - Texto: "Agendar Consultoria Gratuita"
+   - Background gradiente roxo
+   - Bordas arredondadas (8px border-radius)
+   - Efeitos hover com animação de elevação
 
-### **Second Section**
-- **Success Cases/Testimonials**
-- Three cards with metrics and results
-- Grid layout (responsive)
-- Hover effects on cards
-
----
-
-## 🌈 Color Palette
-
-### **Primary Colors**
-- **Background**: Dark gradient (#0a0a0a → #1a0a1a → #2a0a2a → #1a0a1a → #0a0a0a)
-- **Text**: White (#F5F5F5)
-- **Primary Accent**: Purple (#8A2BE2)
-- **Secondary Accent**: Light Purple (#DA70D6)
-
-### **Background Effects**
-- **Base Gradient**: 135-degree diagonal gradient
-- **Purple Accent Circles**: Multiple radial gradients with 0.05-0.1 opacity
-- **Starry Effect**: White speckles (1px-2px) with 0.1 opacity
-- **Fixed Background**: Background stays in place while scrolling
-
-### **Text Colors**
-- **Primary Text**: White (#F5F5F5)
-- **Secondary Text**: Light Grey (#b0b0b0)
-- **Accent Text**: Purple gradient on key phrases
+### **Segunda Seção**
+- **Casos de Sucesso/Depoimentos**
+- Três cards com métricas e resultados
+- Layout em grid (responsivo)
+- Efeitos hover nos cards
 
 ---
 
-## 📝 Typography
+## 🎬 **Especificações do Botão de Play**
 
-### **Font Family**
-- **Primary**: Poppins (Google Fonts)
-- **Weights**: 400 (Regular), 600 (Semi-bold), 700 (Bold)
+### **Design do Botão**
+- **Formato**: Círculo escuro com ícone de play centralizado
+- **Tamanho**: 96px x 96px (w-24 h-24)
+- **Posicionamento**: Centralizado sobre o vídeo
+- **Background**: Preto semi-transparente com backdrop-blur
+- **Borda**: Anel branco semi-transparente (border-white/80)
 
-### **Font Sizes**
-- **Logo**: Large (1200px max-width)
-- **Main Headline**: 2.2rem
+### **Ícone de Play**
+- **Formato**: SVG com triângulo apontando para direita
+- **Tamanho**: 48px x 48px (w-12 h-12)
+- **Cor**: Branco puro (#FFFFFF)
+- **Posicionamento**: Centralizado com margem esquerda de 4px (ml-1)
+
+### **Efeitos Visuais**
+- **Animações**: 
+  - Círculo externo com animate-ping (opacidade 75%)
+  - Hover: scale(1.1) + background mais claro
+- **Transições**: 300ms ease para todas as propriedades
+- **Backdrop**: Blur suave para efeito de vidro
+
+### **Funcionalidade de Clique**
+- **Área de Clique**: Todo o retângulo do vídeo (onClick no elemento video)
+- **Comportamento**: 
+  - Clique em qualquer parte do vídeo inicia a reprodução
+  - Botão de play desaparece quando o vídeo está rodando
+  - Controles de pausa aparecem no hover durante a reprodução
+
+---
+
+## 🌈 **Paleta de Cores**
+
+### **Cores Primárias**
+- **Background**: Gradiente escuro (#0a0a0a → #1a0a1a → #2a0a2a → #1a0a1a → #0a0a0a)
+- **Texto**: Branco (#F5F5F5)
+- **Acento Primário**: Roxo (#8A2BE2)
+- **Acento Secundário**: Roxo Claro (#DA70D6)
+
+### **Efeitos de Background**
+- **Gradiente Base**: Gradiente diagonal de 135 graus
+- **Círculos Roxos**: Múltiplos gradientes radiais com opacidade 0.05-0.1
+- **Efeito Estrelado**: Pontos brancos (1px-2px) com opacidade 0.1
+- **Background Fixo**: Background permanece no lugar durante o scroll
+
+### **Cores de Texto**
+- **Texto Primário**: Branco (#F5F5F5)
+- **Texto Secundário**: Cinza Claro (#b0b0b0)
+- **Texto de Acento**: Gradiente roxo em frases-chave
+
+---
+
+## 📝 **Tipografia**
+
+### **Família de Fontes**
+- **Primária**: Poppins (Google Fonts)
+- **Pesos**: 400 (Regular), 600 (Semi-bold), 700 (Bold)
+
+### **Tamanhos de Fonte**
+- **Logo**: Grande (1200px max-width)
+- **Headline Principal**: 2.2rem
 - **Subheadline**: 1rem
-- **Video Label**: 0.9rem
-- **Button Text**: 1.2rem
-- **Success Section Title**: 2.5rem
-- **Success Card Titles**: 1.5rem
-- **Success Metrics**: 2rem
+- **Label do Vídeo**: 0.9rem
+- **Texto do Botão**: 1.2rem
+- **Título da Seção de Sucesso**: 2.5rem
+- **Títulos dos Cards de Sucesso**: 1.5rem
+- **Métricas de Sucesso**: 2rem
 
-### **Text Effects**
-- **Gradient Text**: Applied to "Growth Engine" and section titles
-- **Letter Spacing**: 2px for video section label
-- **Text Transform**: Uppercase for video label
+### **Efeitos de Texto**
+- **Texto Gradiente**: Aplicado em "DOBRE" e títulos de seção
+- **Espaçamento de Letras**: 2px para label da seção de vídeo
+- **Transformação de Texto**: Maiúsculas para label do vídeo
 
 ---
 
-## 📐 Spacing & Layout
+## 📐 **Espaçamento e Layout**
 
 ### **Container**
-- **Width**: 100% full-width
-- **Max-width**: No constraints
-- **Padding**: Minimal (0.5rem or less)
+- **Largura**: 100% full-width
+- **Max-width**: Sem restrições
+- **Padding**: Mínimo (0.5rem ou menos)
 - **Min-height**: 100vh
 
-### **Section Spacing**
+### **Espaçamento de Seções**
 - **Header**: 0.5rem padding, 0.3rem margin-bottom
 - **Hero**: 0.5rem padding, 0.3rem margin-bottom
-- **Video**: 0.5rem padding, 0.3rem margin-bottom
+- **Vídeo**: 0.5rem padding, 0.3rem margin-bottom
 - **CTA**: 0.5rem padding, 1rem margin-bottom
-- **Success**: 3rem padding, no margins
+- **Sucesso**: 3rem padding, sem margins
 
-### **Element Spacing**
-- **Headline to Subheadline**: 0.2rem margin
-- **Subheadline to Video**: 0.3rem margin
-- **Video to Button**: 0.3rem margin
+### **Espaçamento de Elementos**
+- **Headline para Subheadline**: 0.2rem margin
+- **Subheadline para Vídeo**: 0.3rem margin
+- **Vídeo para Botão**: 0.3rem margin
 
 ---
 
-## 🎭 Visual Effects
+## 🎭 **Efeitos Visuais**
 
-### **Animations**
+### **Animações**
 - **Header**: fadeInDown 1s ease-out
 - **Hero**: fadeIn 1.5s ease-out
-- **Video**: fadeInUp 1s ease-out
+- **Vídeo**: fadeInUp 1s ease-out
 - **CTA**: fadeInUp 1.5s ease-out
-- **Success**: fadeInUp 2s ease-out
+- **Sucesso**: fadeInUp 2s ease-out
 
-### **Hover Effects**
-- **Video Play Button**: Scale 1.1 on hover
-- **CTA Button**: TranslateY(-5px) + enhanced shadow
-- **Success Cards**: TranslateY(-5px) + purple shadow
+### **Efeitos Hover**
+- **Botão de Play**: Scale 1.1 no hover
+- **Botão CTA**: TranslateY(-5px) + sombra aprimorada
+- **Cards de Sucesso**: TranslateY(-5px) + sombra roxa
 
-### **Shadows**
-- **CTA Button**: 0 4px 20px rgba(0, 0, 0, 0.4)
-- **CTA Button Hover**: 0 8px 30px rgba(138, 43, 226, 0.5)
-- **Success Cards Hover**: 0 10px 30px rgba(138, 43, 226, 0.2)
+### **Sombras**
+- **Botão CTA**: 0 4px 20px rgba(0, 0, 0, 0.4)
+- **Botão CTA Hover**: 0 8px 30px rgba(138, 43, 226, 0.5)
+- **Cards de Sucesso Hover**: 0 10px 30px rgba(138, 43, 226, 0.2)
 
 ---
 
-## 📱 Responsive Design
+## 📱 **Design Responsivo**
 
 ### **Breakpoints**
-- **Desktop**: Default styles
+- **Desktop**: Estilos padrão
 - **Tablet**: max-width: 768px
 - **Mobile**: max-width: 480px
 
-### **Mobile Adaptations**
-- **Headline**: Reduces to 2.2rem (mobile)
-- **Logo**: Reduces to 140px max-width
-- **Success Grid**: Single column layout
-- **Success Title**: Reduces to 1.8rem
+### **Adaptações Mobile**
+- **Headline**: Reduz para 2.2rem (mobile)
+- **Logo**: Reduz para 140px max-width
+- **Grid de Sucesso**: Layout de coluna única
+- **Título de Sucesso**: Reduz para 1.8rem
 
 ---
 
-## 🎯 Content Guidelines
+## 🎯 **Diretrizes de Conteúdo**
 
-### **Success Metrics**
-- **Revenue Growth**: +450% (SaaS startup)
-- **Traffic Increase**: +2,300% (E-commerce brand)
-- **Conversion Rate**: +180% (B2B company)
+### **Métricas de Sucesso**
+- **Vendas Mensais**: +347% (Empresa de energia solar)
+- **ROI em Marketing**: +2.8x (Retorno sobre investimento)
+- **Custo de Aquisição**: -65% (Redução de custos)
 
-### **Brand Elements**
-- **Logo Source**: Local file (rarity_logo.png)
-- **External Link**: Links to rarityagency.io
-- **Copyright**: "Rarity Agency © 2025 | All rights reserved."
-
----
-
-## 🚫 Design Constraints
-
-### **What NOT to Do**
-- ❌ Don't use `npm run dev` (static HTML file)
-- ❌ Don't add excessive white space
-- ❌ Don't use bright backgrounds
-- ❌ Don't make video vertical (must be horizontal)
-- ❌ Don't add section background gradients (use main background)
-
-### **What TO Do**
-- ✅ Use full-width layout
-- ✅ Keep elements close together
-- ✅ Use purple gradient accents
-- ✅ Maintain dark theme
-- ✅ Use horizontal video format
-- ✅ Apply hover animations
+### **Elementos da Marca**
+- **Fonte do Logo**: Arquivo local (rarity_logo.png)
+- **Link Externo**: Links para rarityagency.io
+- **Copyright**: "Rarity Agency © 2025 | Todos os direitos reservados."
 
 ---
 
-## 🔧 Technical Specifications
+## 🚫 **Restrições de Design**
 
-### **File Structure**
+### **O que NÃO Fazer**
+- ❌ Não use `npm run dev` (arquivo HTML estático)
+- ❌ Não adicione espaços brancos excessivos
+- ❌ Não use backgrounds brilhantes
+- ❌ Não faça o vídeo horizontal (deve ser vertical)
+- ❌ Não adicione gradientes de background nas seções (use o background principal)
+
+### **O que Fazer**
+- ✅ Use layout de largura total
+- ✅ Mantenha elementos próximos uns dos outros
+- ✅ Use acentos de gradiente roxo
+- ✅ Mantenha o tema escuro
+- ✅ Use formato de vídeo vertical
+- ✅ Aplique animações hover
+
+---
+
+## 🔧 **Especificações Técnicas**
+
+### **Estrutura de Arquivos**
 ```
-lp_caio_rarity_offer-main/
-├── index.html (IP-based language detection)
-├── lp_caio_rarity_offer.html (English version)
-├── lp_caio_rarity_offer_pt.html (Portuguese version)
-├── rarity_logo.png
-├── README.md
-└── DESIGN_RULES.md
+lp_rarity-oferta_energia_solar/
+├── app/                          # Next.js App Router
+│   ├── layout.tsx               # Layout raiz
+│   ├── page.tsx                 # Página inicial
+│   ├── strategy-call/           # Rota de captura de leads
+│   └── globals.css              # Estilos globais
+├── components/                   # Componentes reutilizáveis
+│   ├── ui/                      # Componentes UI
+│   ├── VideoSection.tsx         # Seção de vídeo com funcionalidades
+│   └── LeadCaptureForm.tsx      # Formulário de captura
+├── public/                       # Ativos estáticos
+│   └── rarity_logo.png         # Logo da agência
+├── package.json                  # Dependências e scripts
+├── next.config.js               # Configuração Next.js
+├── tailwind.config.js           # Configuração Tailwind CSS
+└── tsconfig.json                # Configuração TypeScript
 ```
 
-### **Browser Support**
-- Modern browsers (Chrome, Firefox, Safari, Edge)
-- CSS Grid and Flexbox support required
-- CSS custom properties (variables) support required
+### **Suporte de Navegador**
+- Navegadores modernos (Chrome, Firefox, Safari, Edge)
+- Suporte a CSS Grid e Flexbox obrigatório
+- Suporte a propriedades CSS customizadas (variáveis) obrigatório
 
 ### **Performance**
-- Optimized for fast loading
-- Minimal external dependencies
-- Efficient CSS animations
-- Responsive images
+- Otimizado para carregamento rápido
+- Dependências externas mínimas
+- Animações CSS eficientes
+- Imagens responsivas
 
 ---
 
-## 📋 Implementation Checklist
+## 📋 **Checklist de Implementação**
 
-- [x] Dark purple gradient background
-- [x] Starry night effect with speckles
-- [x] Large logo positioning
-- [x] Compact element spacing
-- [x] Horizontal video rectangle
-- [x] Purple gradient text effects
-- [x] Hover animations
-- [x] Responsive design
-- [x] Success cases section
-- [x] Call-to-action button
-- [x] IP-based language detection
-- [x] Portuguese version
-- [x] Language switching buttons
+- [x] Background gradiente roxo escuro
+- [x] Efeito estrelado com pontos
+- [x] Posicionamento do logo grande
+- [x] Espaçamento compacto dos elementos
+- [x] Vídeo retangular vertical
+- [x] Efeitos de texto gradiente
+- [x] Animações hover
+- [x] Design responsivo
+- [x] Seção de casos de sucesso
+- [x] Botão call-to-action
+- [x] Detecção de idioma baseada em IP
+- [x] Versão em português
+- [x] Botões de troca de idioma
+- [x] **Botão de play circular com funcionalidade de clique em qualquer parte do vídeo**
+- [x] **Timing para aparecimento de elementos (urgência após 1:00, CTA após 1:20)**
 
 ---
 
-*Last Updated: 2025*
-*Design System Version: 1.0* 
+*Última Atualização: 2025*
+*Versão do Sistema de Design: 2.0*
+*Stack Atualizada: Next.js 14 + TypeScript + Tailwind CSS* 
