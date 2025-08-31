@@ -95,12 +95,12 @@ export default function SuccessCases({ version = "1", showUrgency = false, showC
             <div className="text-center">
               {/* Ícone e Título */}
               <div className="flex items-center justify-center mb-6">
-                <div className="w-12 h-12 bg-primary-500/20 rounded-full flex items-center justify-center mr-4">
+                <div className="w-12 h-12 bg-primary-500/20 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
                   <svg className="w-6 h-6 text-primary-400" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-primary-400">
+                <h3 className="text-2xl font-bold text-primary-400 leading-none flex items-center transform translate-y-0.5">
                   ATENÇÃO: ÚLTIMA CHANCE ESTE MÊS
                 </h3>
               </div>

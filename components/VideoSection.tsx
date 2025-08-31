@@ -318,9 +318,22 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
         <p className="text-lg text-text-primary font-semibold mb-2">
           ASSISTA COMO FUNCIONA
         </p>
-        <p className="text-text-secondary text-sm">
-          Descubra como empresas de energia solar estão multiplicando vendas
-        </p>
+        {/* Seta minimalista para baixo direcionando para o vídeo */}
+        <div className="flex justify-center mb-2">
+          <svg 
+            className="w-6 h-6 text-white animate-bounce" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={1.5} 
+              d="M19 14l-7 7m0 0l-7-7m7 7V3"
+            />
+          </svg>
+        </div>
       </div>
 
 
