@@ -70,11 +70,5 @@
         }
       ]
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/video-de-vendas.mp4",
-      "destination": "/api/video-proxy"
-    }
   ]
 }

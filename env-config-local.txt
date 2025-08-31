@@ -1,0 +1,18 @@
+# ===== CONFIGURAÇÃO PARA DESENVOLVIMENTO LOCAL =====
+# Use esta configuração para desenvolvimento local
+
+NEXT_PUBLIC_VIDEO_URL=https://pub-bf5dcdc4b650417585257574deb892a7.r2.dev/video-de-vendas.mp4
+R2_ACCESS_KEY_ID=18d46aaf79c9700a7041bb9253f0efc4
+R2_SECRET_ACCESS_KEY=97ab4b36e10a7338ced2485465a01ddc81f2ab6d426925a09ab8e2ca272b228f
+R2_BUCKET_NAME=vsl-solar-rarity-brasil
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NODE_ENV=development
+
+# ===== EXPLICAÇÃO =====
+# NEXT_PUBLIC_SITE_URL=http://localhost:3000 - Para desenvolvimento local
+# NEXT_PUBLIC_VIDEO_URL - URL do vídeo no Cloudflare R2 (funciona em ambos)
+# NODE_ENV=development - Indica ambiente de desenvolvimento
+
+# ===== PARA PRODUÇÃO (Vercel) =====
+# NEXT_PUBLIC_SITE_URL=https://rarityenergiasolar.vercel.app
+# NODE_ENV=production

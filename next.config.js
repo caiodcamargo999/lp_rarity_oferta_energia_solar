@@ -1,11 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
+  // Configuração para arquivos estáticos
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.(mp4|webm|ogg)$/,
+      use: {
+        loader: 'file-loader',
+        options: {
+          publicPath: '/_next/static/videos/',
+          outputPath: 'static/videos/',
+        },
+      },
+    })
+    return config
   },
-  images: {
-    domains: ['n5c9lgm3cwpfoiun.public.blob.vercel-storage.com'],
-  },
+  // Headers otimizados
   async headers() {
     return [
       {
@@ -23,18 +32,23 @@ const nextConfig = {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
           },
-          // Headers específicos para vídeo
+        ],
+      },
+      // Headers para CSS
+      {
+        source: '/(.*).css',
+        headers: [
           {
-            key: 'Cross-Origin-Embedder-Policy',
-            value: 'unsafe-none',
+            key: 'Content-Type',
+            value: 'text/css; charset=utf-8',
           },
           {
-            key: 'Cross-Origin-Opener-Policy',
-            value: 'unsafe-none',
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },
-      // Headers específicos para arquivos de vídeo
+      // Headers para vídeo
       {
         source: '/(.*).mp4',
         headers: [
@@ -46,10 +60,30 @@ const nextConfig = {
             key: 'Content-Type',
             value: 'video/mp4',
           },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      // Headers para imagens
+      {
+        source: '/(.*).(jpg|jpeg|png|gif|webp)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
         ],
       },
     ]
   },
+  // Configuração de trailing slash
+  trailingSlash: false,
+  // Configuração de compressão
+  compress: true,
+  // Configuração de power by header
+  poweredByHeader: false,
 }
 
 module.exports = nextConfig

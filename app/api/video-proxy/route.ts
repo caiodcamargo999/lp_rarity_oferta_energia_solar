@@ -5,13 +5,20 @@ export async function GET(request: NextRequest) {
     // ===== DEBUG: VERIFICAR VARIÁVEIS DE AMBIENTE =====
     console.log('🔍 Variáveis de ambiente:', {
       NEXT_PUBLIC_VIDEO_URL: process.env.NEXT_PUBLIC_VIDEO_URL,
+      R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID ? '***' : 'undefined',
+      R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY ? '***' : 'undefined',
       NODE_ENV: process.env.NODE_ENV,
       VERCEL: process.env.VERCEL,
       VERCEL_ENV: process.env.VERCEL_ENV
     })
     
-    // ===== URL DO VÍDEO - PRIORIDADE PARA VARIÁVEL DE AMBIENTE =====
-    const videoUrl = process.env.NEXT_PUBLIC_VIDEO_URL || 'https://n5c9lgm3cwpfoiun.public.blob.vercel-storage.com/video-de-vendas.mp4'
+    // ===== CLOUDFLARE R2 - URL OBRIGATÓRIA =====
+    const videoUrl = process.env.NEXT_PUBLIC_VIDEO_URL || 'https://77f677cc90bcd810f75c80680f636a46.r2.cloudflarestorage.com/vsl-solar-rarity-brasil/video-de-vendas.mp4'
+    
+    // ===== VERIFICAR SE A URL É VÁLIDA =====
+    if (!videoUrl || videoUrl === '') {
+      throw new Error('URL do vídeo não configurada. Configure NEXT_PUBLIC_VIDEO_URL com a URL do Cloudflare R2.')
+    }
     
     console.log('🎬 Tentando carregar vídeo de:', videoUrl)
     
@@ -21,6 +28,7 @@ export async function GET(request: NextRequest) {
     
     // ===== CONFIGURAÇÕES OTIMIZADAS PARA STREAMING =====
     const response = await fetch(videoUrl, {
+      method: 'GET',
       headers: {
         'Range': range || 'bytes=0-',
         'Cache-Control': 'public, max-age=31536000, immutable',
@@ -42,7 +50,17 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       console.error(`❌ Erro ao buscar vídeo: ${response.status} - ${response.statusText}`)
-      throw new Error(`Failed to fetch video: ${response.status} - ${response.statusText}`)
+      
+      // ===== TRATAMENTO ESPECÍFICO PARA ERROS COMUNS =====
+      if (response.status === 403) {
+        throw new Error('Acesso negado ao vídeo. Verifique permissões do Cloudflare R2.')
+      } else if (response.status === 404) {
+        throw new Error('Vídeo não encontrado. Verifique se o arquivo foi uploadado no Cloudflare R2.')
+      } else if (response.status >= 500) {
+        throw new Error('Erro interno do servidor de vídeo. Tente novamente mais tarde.')
+      } else {
+        throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`)
+      }
     }
 
     console.log('✅ Vídeo carregado com sucesso! Status:', response.status)
@@ -85,54 +103,47 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('❌ Erro crítico no proxy de vídeo:', error)
     
-    // ===== FALLBACK: TENTAR URL ALTERNATIVA =====
-    try {
-      console.log('🔄 Tentando URL alternativa...')
-      const fallbackUrl = 'https://n5c9lgm3cwpfoiun.public.blob.vercel-storage.com/video-de-vendas.mp4'
-      
-      const fallbackResponse = await fetch(fallbackUrl, {
-        headers: { 
-          'Range': request.headers.get('range') || 'bytes=0-',
-          'Accept': 'video/mp4,video/*;q=0.9,*/*;q=0.8',
-          'Accept-Encoding': 'identity',
-        }
-      })
-      
-      if (fallbackResponse.ok) {
-        console.log('✅ Fallback funcionou!')
-        return new NextResponse(fallbackResponse.body, {
-          status: fallbackResponse.status,
-          headers: {
-            'Content-Type': 'video/mp4',
-            'Content-Length': fallbackResponse.headers.get('content-length') || '',
-            'Accept-Ranges': 'bytes',
-            'Cache-Control': 'public, max-age=31536000, immutable',
-            'Access-Control-Allow-Origin': '*',
-            'X-Content-Type-Options': 'nosniff',
-          },
-        })
-      }
-    } catch (fallbackError) {
-      console.error('❌ Fallback também falhou:', fallbackError)
-    }
+    // ===== RESPOSTA DE ERRO DETALHADA =====
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
     
     return NextResponse.json(
       { 
         error: 'Erro ao carregar vídeo',
-        details: error instanceof Error ? error.message : 'Erro desconhecido',
-        timestamp: new Date().toISOString()
+        message: errorMessage,
+        details: error instanceof Error ? error.stack : 'Sem detalhes disponíveis',
+        timestamp: new Date().toISOString(),
+        suggestions: [
+          'Configure Cloudflare R2 para armazenamento mais barato',
+          'Verifique se as variáveis de ambiente estão definidas',
+          'Confirme se o bucket está marcado como público',
+          'Teste se o arquivo de vídeo está acessível diretamente',
+          'Alternativas: Backblaze B2, Supabase Storage, AWS S3'
+        ]
       },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+        }
+      }
     )
   }
 }
 
 export async function HEAD(request: NextRequest) {
   try {
-    const videoUrl = process.env.NEXT_PUBLIC_VIDEO_URL || 'https://n5c9lgm3cwpfoiun.public.blob.vercel-storage.com/video-de-vendas.mp4'
+    const videoUrl = process.env.NEXT_PUBLIC_VIDEO_URL || 'https://77f677cc90bcd810f75c80680f636a46.r2.cloudflarestorage.com/vsl-solar-rarity-brasil/video-de-vendas.mp4'
+    
+    if (!videoUrl || videoUrl === '') {
+      throw new Error('URL do vídeo não configurada. Configure NEXT_PUBLIC_VIDEO_URL.')
+    }
     
     // Buscar apenas headers do vídeo
-    const response = await fetch(videoUrl, { method: 'HEAD' })
+    const response = await fetch(videoUrl, { 
+      method: 'HEAD',
+      signal: AbortSignal.timeout(10000) // 10 segundos timeout para HEAD
+    })
 
     if (!response.ok) {
       throw new Error(`Failed to fetch video headers: ${response.status}`)
@@ -154,7 +165,11 @@ export async function HEAD(request: NextRequest) {
   } catch (error) {
     console.error('Erro no HEAD do vídeo:', error)
     return NextResponse.json(
-      { error: 'Erro ao carregar headers do vídeo' },
+      { 
+        error: 'Erro ao carregar headers do vídeo',
+        message: error instanceof Error ? error.message : 'Erro desconhecido',
+        timestamp: new Date().toISOString()
+      },
       { status: 500 }
     )
   }
@@ -168,6 +183,7 @@ export async function OPTIONS() {
       'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
       'Access-Control-Allow-Headers': 'Range',
       'Access-Control-Max-Age': '86400',
+      'Content-Type': 'text/plain',
     },
   })
 }

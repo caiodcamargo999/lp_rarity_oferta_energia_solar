@@ -14,6 +14,11 @@ export default function HomePage() {
   const [showUrgency, setShowUrgency] = useState(false)
   const [showCTA, setShowCTA] = useState(false)
 
+  // ===== DETECÇÃO AUTOMÁTICA DE AMBIENTE =====
+  const siteUrl = process.env.NODE_ENV === 'development' 
+    ? process.env.NEXT_PUBLIC_SITE_URL_LOCAL 
+    : process.env.NEXT_PUBLIC_SITE_URL_PROD;
+
   const handleVideoTimeUpdate = (time: number) => {
     // Versão 1: sempre mostrar tudo
     // Versão 2: timing controlado pelo VideoSection

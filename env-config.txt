@@ -1,0 +1,19 @@
+# ===== COPIE ESTE CONTEÚDO PARA O ARQUIVO .env.local =====
+
+# ===== CLOUDFLARE R2 - CONFIGURAÇÃO FUNCIONANDO =====
+NEXT_PUBLIC_VIDEO_URL=https://pub-bf5dcdc4b650417585257574deb892a7.r2.dev/video-de-vendas.mp4
+
+# ===== CREDENCIAIS R2 (para futuras operações) =====
+R2_ACCESS_KEY_ID=18d46aaf79c9700a7041bb9253f0efc4
+R2_SECRET_ACCESS_KEY=97ab4b36e10a7338ced2485465a01ddc81f2ab6d426925a09ab8e2ca272b228f
+R2_BUCKET_NAME=vsl-solar-rarity-brasil
+
+# ===== CONFIGURAÇÕES DO PROJETO =====
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NODE_ENV=development
+
+# ===== INSTRUÇÕES =====
+# 1. Crie um arquivo chamado .env.local na raiz do projeto
+# 2. Cole o conteúdo acima (sem os comentários #)
+# 3. Salve o arquivo
+# 4. Reinicie o servidor: npm run dev
