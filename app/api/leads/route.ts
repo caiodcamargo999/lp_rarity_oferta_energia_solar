@@ -87,7 +87,7 @@ Esta é uma sessão estratégica gratuita de 60 minutos para discutir estratégi
 
     const response = await calendar.events.insert({
       calendarId: 'primary',
-      resource: event,
+      requestBody: event,
       conferenceDataVersion: 1,
       sendUpdates: 'all'
     })
@@ -141,7 +141,7 @@ async function saveToGoogleSheets(leadData: LeadData, calendarEvent: any) {
 // Função para enviar email de confirmação
 async function sendConfirmationEmail(leadData: LeadData, calendarEvent: any) {
   try {
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT || '587'),
       secure: false,
