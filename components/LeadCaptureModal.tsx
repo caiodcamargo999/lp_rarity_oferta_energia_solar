@@ -123,8 +123,9 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
       case 'name':
         return value.trim().length < 2 ? 'Nome deve ter pelo menos 2 caracteres' : ''
       case 'whatsapp':
-        const whatsappRegex = /^\([1-9]{2}\)\s[9]{0,1}[0-9]{4}-[0-9]{4}$/
-        return !whatsappRegex.test(value) ? 'WhatsApp deve estar no formato: (XX) XXXXX-XXXX' : ''
+        // Validação mais flexível para WhatsApp
+        const clean = value.replace(/\D/g, '')
+        return clean.length < 10 ? 'WhatsApp deve ter pelo menos 10 dígitos' : ''
       case 'email':
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         return !emailRegex.test(value) ? 'E-mail deve ter um formato válido' : ''
@@ -243,8 +244,8 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
   // Validação do WhatsApp
   const validateWhatsApp = (value: string) => {
     const clean = cleanWhatsApp(value)
-    // Deve ter 11 dígitos (código do estado + 9 dígitos)
-    return clean.length === 11
+    // Deve ter pelo menos 10 dígitos (mais flexível)
+    return clean.length >= 10
   }
 
   // Handler para mudança no WhatsApp
@@ -253,13 +254,13 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
     const formatted = formatWhatsApp(value)
     setFormData(prev => ({ ...prev, whatsapp: formatted }))
     
-    // Validação em tempo real
-    if (formatted.length > 0) {
-      const isValid = validateWhatsApp(formatted)
-      setErrors(prev => ({ ...prev, whatsapp: isValid ? '' : 'WhatsApp deve estar no formato: (XX) XXXXX-XXXX' }))
-    } else {
-      setErrors(prev => ({ ...prev, whatsapp: '' }))
-    }
+         // Validação em tempo real
+     if (formatted.length > 0) {
+       const isValid = validateWhatsApp(formatted)
+       setErrors(prev => ({ ...prev, whatsapp: isValid ? '' : 'WhatsApp deve ter pelo menos 10 dígitos' }))
+     } else {
+       setErrors(prev => ({ ...prev, whatsapp: '' }))
+     }
   }
 
   // Handler para tecla Enter
@@ -383,7 +384,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                          onChange={(e) => handleInputChange('name', e.target.value)}
                          onKeyPress={handleKeyPress}
                          placeholder="Digite seu nome completo"
-                         className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-300/40 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
+                         className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400/20 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
                        />
                                              {errors.name && (
                          <p className="text-red-300/60 text-xs opacity-70">{errors.name}</p>
@@ -399,7 +400,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                          onChange={handleWhatsAppChange}
                          onKeyPress={handleKeyPress}
                          placeholder="(XX) XXXXX-XXXX"
-                         className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-300/40 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
+                         className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400/20 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
                        />
                                              {errors.whatsapp && (
                          <p className="text-red-300/60 text-xs opacity-70">{errors.whatsapp}</p>
@@ -415,7 +416,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                          onChange={(e) => handleInputChange('email', e.target.value)}
                          onKeyPress={handleKeyPress}
                          placeholder="seu@email.com"
-                         className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-300/40 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
+                         className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400/20 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
                        />
                                              {errors.email && (
                          <p className="text-red-300/60 text-xs opacity-70">{errors.email}</p>
@@ -431,7 +432,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                          onKeyPress={handleKeyPress}
                          placeholder="Descreva sua maior dificuldade para crescer no mercado de energia solar..."
                          rows={3}
-                         className="w-full text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-300/40 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all resize-none px-4 py-3 border rounded-xl"
+                         className="w-full text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400/20 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all resize-none px-4 py-3 border rounded-xl"
                        />
                                              {errors.painPoint && (
                          <p className="text-red-300/60 text-xs opacity-70">{errors.painPoint}</p>
@@ -539,17 +540,17 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                                              disabled={!selectedDay || !selectedTimeSlot || isSubmitting}
                       className="flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white font-medium rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
                     >
-                      {isSubmitting ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          <span>Agendando...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Calendar size={16} />
-                          <span>Confirmar Agendamento</span>
-                        </>
-                      )}
+                                             {isSubmitting ? (
+                         <>
+                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                           <span>Agendando...</span>
+                         </>
+                       ) : (
+                         <>
+                           <Calendar size={16} />
+                           <span>Sessão Estratégica</span>
+                         </>
+                       )}
                     </Button>
                   )}
                 </div>
