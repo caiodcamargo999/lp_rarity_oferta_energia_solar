@@ -77,11 +77,22 @@ body { /* Roxo muito escuro e metálico */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  /* ===== FUNDO ESCURO RESTAURADO ===== */
-  background: linear-gradient(135deg, 
-    rgb(10, 10, 10) 0%, 
-    rgb(42, 10, 42) 50%, 
-    rgb(10, 10, 10) 100%);
+  /* ===== FUNDO ROXO ESCURO NAS BORDAS, LINHA DIAGONAL CLARA NO CENTRO ===== */
+  background: 
+    linear-gradient(135deg, 
+      rgb(0, 0, 2) 0%, 
+      rgb(2, 1, 6) 5%, 
+      rgb(8, 2, 15) 15%, 
+      rgb(15, 4, 25) 25%, 
+      rgb(25, 7, 35) 35%, 
+      rgb(35, 10, 45) 45%, 
+      rgb(45, 12, 55) 55%, 
+      rgb(35, 10, 45) 65%, 
+      rgb(25, 7, 35) 75%, 
+      rgb(15, 4, 25) 85%, 
+      rgb(8, 2, 15) 92%, 
+      rgb(2, 1, 6) 97%, 
+      rgb(0, 0, 2) 100%);
   color: var(--text-primary);
 }
 

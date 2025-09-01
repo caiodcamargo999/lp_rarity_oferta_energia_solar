@@ -58,22 +58,22 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
   }
 
   useEffect(() => {
-    // Apenas na versão 2: mostrar seções com delays
-    if (version === "2") {
-      // Mostrar seção de urgência após 1:00 (60 segundos) de vídeo
+      // Apenas na versão 2: mostrar seções com delays
+      if (version === "2") {
+        // Mostrar seção de urgência após 1:00 (60 segundos) de vídeo
       if (currentVideoTime >= 60 && !showUrgency) {
-        console.log('⏰ 1:00 atingido - Mostrando seção de urgência!')
-        setShowUrgency(true)
-        if (onUrgencyChange) onUrgencyChange(true)
-      }
-      
+          console.log('⏰ 1:00 atingido - Mostrando seção de urgência!')
+          setShowUrgency(true)
+          if (onUrgencyChange) onUrgencyChange(true)
+        }
+        
       // Mostrar CTA após 1:20 (80 segundos) de vídeo
       if (currentVideoTime >= 80 && !showCTA) {
         console.log('🎯 1:20 atingido - Mostrando CTA!')
-        setShowCTA(true)
-        if (onCTAChange) onCTAChange(true)
+          setShowCTA(true)
+          if (onCTAChange) onCTAChange(true)
+        }
       }
-    }
   }, [currentVideoTime, version, showUrgency, showCTA, onUrgencyChange, onCTAChange])
 
   const handleVideoTimeUpdate = (time: number) => {
@@ -107,7 +107,7 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
           className="mb-6"
         >
           <h2 className="text-lg font-semibold text-text-primary">
-            ASSISTA COMO FUNCIONA
+          ASSISTA COMO FUNCIONA
           </h2>
           
           {/* Flechinha para baixo - RESTAURADA */}
@@ -119,17 +119,17 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
           >
             <svg
               className="w-6 h-6 mx-auto text-text-primary animate-bounce"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
                 strokeWidth={2}
-                d="M19 14l-7 7m0 0l-7-7m7 7V3"
-              />
-            </svg>
+              d="M19 14l-7 7m0 0l-7-7m7 7V3"
+            />
+          </svg>
           </motion.div>
         </motion.div>
 
@@ -152,22 +152,22 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
           </div>
         </motion.div>
 
-        {/* CTA Button - Sempre visível na versão 1, com delays na versão 2 */}
-        {(version === "1" || showCTA) && (
-          <motion.div
+      {/* CTA Button - Sempre visível na versão 1, com delays na versão 2 */}
+      {(version === "1" || showCTA) && (
+        <motion.div
             className="mt-8 flex justify-center w-full"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
             <button
               onClick={onOpenModal}
               className="btn-minimal w-full max-w-md bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white font-bold py-4 px-8 rounded-xl transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
-            >
-              AGENDAR SESSÃO ESTRATÉGICA
+          >
+            AGENDAR SESSÃO ESTRATÉGICA
             </button>
-          </motion.div>
-        )}
+        </motion.div>
+      )}
 
         {/* Seção de Urgência - Apenas na versão 2 com delay */}
         {version === "2" && showUrgency && (
@@ -184,7 +184,7 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
               Esta estratégia está funcionando para empresas de energia solar e as vagas são limitadas. 
               Não perca a chance de transformar seu negócio!
             </p>
-          </motion.div>
+    </motion.div>
         )}
       </div>
     </motion.section>

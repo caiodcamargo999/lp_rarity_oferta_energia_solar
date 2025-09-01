@@ -277,7 +277,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
 
   if (!isOpen) return null
 
-  return (
+        return (
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0 }}
@@ -286,7 +286,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
         className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-sm"
         onClick={onClose}
       >
-        <motion.div
+          <motion.div
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -316,7 +316,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
             <div className="text-center">
               <h2 className="text-xl font-semibold text-white mb-1">
                 Sessão Estratégica Gratuita
-              </h2>
+            </h2>
               <p className="text-gray-400 text-xs font-normal">
                 Passo {currentStep + 1} de {steps.length}
               </p>
@@ -349,16 +349,16 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                    })}</p>
                    <p>{selectedTimeSlot} (Brasília)</p>
                    <p>Check-in: 15 minutos antes</p>
-                 </div>
-              </motion.div>
+            </div>
+          </motion.div>
             ) : (
               <>
                 {/* Step Title - Apenas a pergunta atual */}
-                <motion.div
+          <motion.div
                   key={`step-title-${currentStep}`}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
                   className="text-center mb-6"
                 >
@@ -379,17 +379,17 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                   {currentStep === 0 && (
                     <div className="space-y-3">
                                              <Input
-                         type="text"
+                  type="text"
                          value={formData.name}
                          onChange={(e) => handleInputChange('name', e.target.value)}
                          onKeyPress={handleKeyPress}
-                         placeholder="Digite seu nome completo"
+                  placeholder="Digite seu nome completo"
                          className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400/20 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
-                       />
-                                             {errors.name && (
+                />
+                {errors.name && (
                          <p className="text-red-300/60 text-xs opacity-70">{errors.name}</p>
-                       )}
-                    </div>
+                )}
+              </div>
                   )}
 
                   {currentStep === 1 && (
@@ -401,43 +401,43 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                          onKeyPress={handleKeyPress}
                          placeholder="(XX) XXXXX-XXXX"
                          className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400/20 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
-                       />
-                                             {errors.whatsapp && (
+                />
+                {errors.whatsapp && (
                          <p className="text-red-300/60 text-xs opacity-70">{errors.whatsapp}</p>
-                       )}
-                    </div>
+                )}
+              </div>
                   )}
 
                   {currentStep === 2 && (
                     <div className="space-y-3">
                                              <Input
-                         type="email"
+                  type="email"
                          value={formData.email}
                          onChange={(e) => handleInputChange('email', e.target.value)}
                          onKeyPress={handleKeyPress}
-                         placeholder="seu@email.com"
+                  placeholder="seu@email.com"
                          className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400/20 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
-                       />
-                                             {errors.email && (
+                />
+                {errors.email && (
                          <p className="text-red-300/60 text-xs opacity-70">{errors.email}</p>
-                       )}
-                    </div>
+                )}
+              </div>
                   )}
 
                   {currentStep === 3 && (
                     <div className="space-y-3">
-                                             <textarea
+              <textarea
                          value={formData.painPoint}
                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('painPoint', e.target.value)}
                          onKeyPress={handleKeyPress}
                          placeholder="Descreva sua maior dificuldade para crescer no mercado de energia solar..."
                          rows={3}
                          className="w-full text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400/20 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all resize-none px-4 py-3 border rounded-xl"
-                       />
-                                             {errors.painPoint && (
+              />
+              {errors.painPoint && (
                          <p className="text-red-300/60 text-xs opacity-70">{errors.painPoint}</p>
-                       )}
-                    </div>
+              )}
+            </div>
                   )}
 
                   {currentStep === 4 && (
@@ -461,18 +461,18 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                               <div className="space-y-1">
                                 <div className="text-xs text-gray-400 uppercase tracking-wide">
                                   {day.dayName}
-                                </div>
+              </div>
                                 <div className="text-lg font-bold">
                                   {day.dayNumber}
-                                </div>
+            </div>
                                 <div className="text-xs text-gray-400">
                                   {day.month}
-                                </div>
-                              </div>
+                </div>
+              </div>
                             </button>
                           ))}
-                        </div>
-                      </div>
+              </div>
+            </div>
 
                       {/* Seleção de Horário */}
                       {selectedDay && (
@@ -482,7 +482,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                           </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             {timeSlots.map((slot) => (
-                              <button
+              <button
                                 key={slot.id}
                                 onClick={() => setSelectedTimeSlot(slot.time)}
                                 disabled={!slot.available}
@@ -498,14 +498,14 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                                   <Clock size={14} />
                                   <span className="text-sm font-medium">{slot.time}</span>
                                 </div>
-                              </button>
+              </button>
                             ))}
-                          </div>
-                        </div>
+                </div>
+              </div>
                       )}
 
-                      
-                    </div>
+
+              </div>
                   )}
                 </motion.div>
 
@@ -540,25 +540,25 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                                              disabled={!selectedDay || !selectedTimeSlot || isSubmitting}
                       className="flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white font-medium rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
                     >
-                                             {isSubmitting ? (
-                         <>
-                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                            <span>Agendando...</span>
-                         </>
-                       ) : (
-                         <>
+                        </>
+                      ) : (
+                        <>
                            <Calendar size={16} />
                            <span>Sessão Estratégica</span>
-                         </>
-                       )}
+                        </>
+                      )}
                     </Button>
                   )}
                 </div>
               </>
-            )}
-          </div>
+              )}
+            </div>
+          </motion.div>
         </motion.div>
-      </motion.div>
     </AnimatePresence>
   )
 }
