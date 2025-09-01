@@ -48,24 +48,46 @@ const nextConfig = {
           },
         ],
       },
-      // Headers para vídeo
+        // Headers para vídeo otimizados
+  {
+    source: '/(.*).mp4',
+    headers: [
       {
-        source: '/(.*).mp4',
-        headers: [
-          {
-            key: 'Accept-Ranges',
-            value: 'bytes',
-          },
-          {
-            key: 'Content-Type',
-            value: 'video/mp4',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
+        key: 'Accept-Ranges',
+        value: 'bytes',
       },
+      {
+        key: 'Content-Type',
+        value: 'video/mp4',
+      },
+      {
+        key: 'Cache-Control',
+        value: 'public, max-age=31536000, immutable',
+      },
+      {
+        key: 'X-Content-Type-Options',
+        value: 'nosniff',
+      },
+    ],
+  },
+  // Headers para WebM
+  {
+    source: '/(.*).webm',
+    headers: [
+      {
+        key: 'Accept-Ranges',
+        value: 'bytes',
+      },
+      {
+        key: 'Content-Type',
+        value: 'video/webm',
+      },
+      {
+        key: 'Cache-Control',
+        value: 'public, max-age=31536000, immutable',
+      },
+    ],
+  },
       // Headers para imagens
       {
         source: '/(.*).(jpg|jpeg|png|gif|webp)',

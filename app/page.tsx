@@ -7,12 +7,14 @@ import Image from 'next/image'
 import Link from 'next/link'
 import VideoSection from '../components/VideoSection'
 import SuccessCases from '../components/SuccessCases'
+import LeadCaptureModal from '../components/LeadCaptureModal'
 import { useState } from 'react'
 
 export default function HomePage() {
   // Página raiz (/) - Todas as seções aparecem desde o começo
   const [showUrgency, setShowUrgency] = useState(false)
   const [showCTA, setShowCTA] = useState(false)
+  const [isLeadModalOpen, setIsLeadModalOpen] = useState(false)
 
   // ===== DETECÇÃO AUTOMÁTICA DE AMBIENTE =====
   const siteUrl = process.env.NODE_ENV === 'development' 
@@ -65,7 +67,7 @@ export default function HomePage() {
           <p className="text-body text-text-secondary mb-8 max-w-3xl mx-auto leading-relaxed tracking-normal">
             <strong className="text-text-primary">Empresas de energia solar</strong> estão perdendo milhões em vendas por não usar <span className="gradient-text">IA + Anúncios Online</span>. 
             <br/><br/>
-            Nós implementamos sistemas que <strong className="text-text-primary">automatizam 80% do processo de vendas</strong> e multiplicam seus resultados usando estratégias comprovadas de <span className="gradient-text">copywriting persuasivo</span>, <span className="text-primary">automação inteligente</span> e <span className="gradient-text">anúncios online em escala</span>.
+            Nós implementamos sistemas que <strong className="text-text-primary">automatizam 80% do processo de vendas</strong> e multiplicam seus resultados usando estratégias comprovadas de <span className="gradient-text">copywriting persuasivo</span>, <span className="text-primary">automação inteligente</span> e <span className="text-primary">anúncios online em escala</span>.
           </p>
         </div>
       </motion.section>
@@ -76,6 +78,7 @@ export default function HomePage() {
         onTimeUpdate={handleVideoTimeUpdate}
         onUrgencyChange={setShowUrgency}
         onCTAChange={setShowCTA}
+        onOpenModal={() => setIsLeadModalOpen(true)}
       />
 
       {/* Success Cases Section */}
@@ -115,6 +118,12 @@ export default function HomePage() {
           </p>
         </div>
       </footer>
+
+      {/* Modal de Captação de Leads */}
+      <LeadCaptureModal
+        isOpen={isLeadModalOpen}
+        onClose={() => setIsLeadModalOpen(false)}
+      />
     </main>
   )
 }

@@ -6,11 +6,13 @@ import Link from 'next/link'
 import { useState } from 'react'
 import VideoSection from '../../components/VideoSection'
 import SuccessCases from '../../components/SuccessCases'
+import LeadCaptureModal from '../../components/LeadCaptureModal'
 
 export default function HomePageV2() {
   // Versão /2: Com delays solicitados
   const [showUrgency, setShowUrgency] = useState(false)
   const [showCTA, setShowCTA] = useState(false)
+  const [isLeadModalOpen, setIsLeadModalOpen] = useState(false)
 
   const handleVideoTimeUpdate = (time: number) => {
     // Versão 2: timing controlado pelo VideoSection
@@ -67,6 +69,7 @@ export default function HomePageV2() {
         onTimeUpdate={handleVideoTimeUpdate}
         onUrgencyChange={setShowUrgency}
         onCTAChange={setShowCTA}
+        onOpenModal={() => setIsLeadModalOpen(true)}
       />
 
       {/* Success Cases Section */}
@@ -106,6 +109,12 @@ export default function HomePageV2() {
           </p>
         </div>
       </footer>
+
+      {/* Modal de Captação de Leads */}
+      <LeadCaptureModal
+        isOpen={isLeadModalOpen}
+        onClose={() => setIsLeadModalOpen(false)}
+      />
     </main>
   )
 }

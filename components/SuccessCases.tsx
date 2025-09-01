@@ -1,8 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import LeadCaptureModal from './LeadCaptureModal'
 
 interface SuccessCasesProps {
   version?: "1" | "2"
@@ -31,6 +31,7 @@ const successData = [
 export default function SuccessCases({ version = "1", showUrgency = false, showCTA = false }: SuccessCasesProps) {
   const [localShowUrgency, setLocalShowUrgency] = useState(false)
   const [localShowCTA, setLocalShowCTA] = useState(false)
+  const [isLeadModalOpen, setIsLeadModalOpen] = useState(false)
 
   useEffect(() => {
     if (version === "1") {
@@ -116,17 +117,23 @@ export default function SuccessCases({ version = "1", showUrgency = false, showC
               
               {/* Botão CTA */}
               {localShowCTA && (
-                <Link
-                  href="/strategy-call"
+                <button
+                  onClick={() => setIsLeadModalOpen(true)}
                   className="btn-minimal px-8 py-4 text-lg font-bold bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 transform hover:scale-105 transition-all duration-300"
                 >
                   QUERO IMPLEMENTAR NA MINHA EMPRESA
-                </Link>
+                </button>
               )}
             </div>
           </motion.div>
         )}
       </div>
+
+      {/* Modal de Captação de Leads */}
+      <LeadCaptureModal
+        isOpen={isLeadModalOpen}
+        onClose={() => setIsLeadModalOpen(false)}
+      />
     </motion.section>
   )
 }
