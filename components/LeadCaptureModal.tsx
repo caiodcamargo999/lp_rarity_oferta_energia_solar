@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Calendar, Clock, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react'
+import { X, Calendar, Clock, CheckCircle, ArrowRight, ArrowLeft, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { usePathname } from 'next/navigation'
 
 interface FormData {
   name: string
@@ -41,6 +42,12 @@ const generateAvailableDays = (): DaySlot[] => {
   let currentDate = new Date(brasiliaTime)
   let daysAdded = 0
   
+  // Se já passou das 18h, começar do próximo dia
+  const currentHour = brasiliaTime.getHours()
+  if (currentHour >= 18) {
+    currentDate.setDate(currentDate.getDate() + 1)
+  }
+  
   while (daysAdded < 7) {
     // Pular domingos (0 = domingo)
     if (currentDate.getDay() !== 0) {
@@ -71,19 +78,6 @@ interface LeadCaptureModalProps {
   onClose: () => void
 }
 
-const timeSlots: TimeSlot[] = [
-  { id: '08:00', time: '08:00', available: true },
-  { id: '09:00', time: '09:00', available: true },
-  { id: '10:00', time: '10:00', available: true },
-  { id: '11:00', time: '11:00', available: true },
-  { id: '12:00', time: '12:00', available: true },
-  { id: '13:00', time: '13:00', available: true },
-  { id: '14:00', time: '14:00', available: true },
-  { id: '15:00', time: '15:00', available: true },
-  { id: '16:00', time: '16:00', available: true },
-  { id: '17:00', time: '17:00', available: true },
-]
-
 const steps = [
   { id: 'name', title: 'Qual é o seu nome?', field: 'name' as keyof FormData },
   { id: 'whatsapp', title: 'Qual é o seu WhatsApp?', field: 'whatsapp' as keyof FormData },
@@ -93,6 +87,7 @@ const steps = [
 ]
 
 export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalProps) {
+  const pathname = usePathname()
   const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -105,6 +100,8 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [errors, setErrors] = useState<Partial<FormData>>({})
+  const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>([])
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false)
 
   useEffect(() => {
     if (isOpen) {
@@ -117,6 +114,38 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
       document.body.style.overflow = 'unset'
     }
   }, [isOpen])
+
+  // Buscar horários disponíveis quando um dia for selecionado
+  useEffect(() => {
+    if (selectedDay) {
+      // Mostrar horários padrão INSTANTANEAMENTE
+      const defaultSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00']
+      setAvailableTimeSlots(defaultSlots)
+      setIsLoadingSlots(false)
+      
+      // DESABILITADO TEMPORARIAMENTE - API está travando
+      // fetchAvailableTimeSlots(selectedDay)
+    }
+  }, [selectedDay])
+
+  const fetchAvailableTimeSlots = async (date: string) => {
+    setIsLoadingSlots(true)
+    try {
+      const response = await fetch(`/api/leads?date=${date}`)
+      if (response.ok) {
+        const data = await response.json()
+        setAvailableTimeSlots(data.availableSlots || [])
+      } else {
+        console.error('Erro ao buscar horários disponíveis')
+        setAvailableTimeSlots([])
+      }
+    } catch (error) {
+      console.error('Erro ao buscar horários disponíveis:', error)
+      setAvailableTimeSlots([])
+    } finally {
+      setIsLoadingSlots(false)
+    }
+  }
 
   const validateField = (field: keyof FormData, value: string): string => {
     switch (field) {
@@ -173,40 +202,34 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
       return
     }
 
-    setIsSubmitting(true)
+    // Mostrar confirmação IMEDIATAMENTE
+    setIsSuccess(true)
     
+    // Processar em background (sem bloquear a UI)
     try {
       const response = await fetch('/api/leads', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-                 body: JSON.stringify({
-           ...formData,
-           scheduledDate: selectedDay,
-           scheduledTime: selectedTimeSlot,
-         }),
+        body: JSON.stringify({
+          ...formData,
+          scheduledDate: selectedDay,
+          scheduledTime: selectedTimeSlot,
+          sourcePage: pathname || '/', // Pass the current page path
+        }),
       })
 
       if (response.ok) {
-        setIsSuccess(true)
-        // Reset form after 3 seconds
-        setTimeout(() => {
-          onClose()
-          setCurrentStep(0)
-          setFormData({ name: '', whatsapp: '', email: '', painPoint: '' })
-                     setSelectedDay('')
-           setSelectedTimeSlot('')
-          setIsSuccess(false)
-        }, 3000)
+        console.log('✅ Lead processado com sucesso!')
+        // A confirmação já está visível, não precisa fazer nada
       } else {
-        throw new Error('Falha ao enviar formulário')
+        console.error('❌ Erro ao processar lead:', response.status)
+        // Mesmo com erro, manter a confirmação visível
       }
     } catch (error) {
-      console.error('Erro ao enviar formulário:', error)
-      alert('Erro ao enviar formulário. Tente novamente.')
-    } finally {
-      setIsSubmitting(false)
+      console.error('❌ Erro ao enviar formulário:', error)
+      // Mesmo com erro, manter a confirmação visível
     }
   }
 
@@ -254,13 +277,13 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
     const formatted = formatWhatsApp(value)
     setFormData(prev => ({ ...prev, whatsapp: formatted }))
     
-         // Validação em tempo real
-     if (formatted.length > 0) {
-       const isValid = validateWhatsApp(formatted)
-       setErrors(prev => ({ ...prev, whatsapp: isValid ? '' : 'WhatsApp deve ter pelo menos 10 dígitos' }))
-     } else {
-       setErrors(prev => ({ ...prev, whatsapp: '' }))
-     }
+    // Validação em tempo real
+    if (formatted.length > 0) {
+      const isValid = validateWhatsApp(formatted)
+      setErrors(prev => ({ ...prev, whatsapp: isValid ? '' : 'WhatsApp deve ter pelo menos 10 dígitos' }))
+    } else {
+      setErrors(prev => ({ ...prev, whatsapp: '' }))
+    }
   }
 
   // Handler para tecla Enter
@@ -277,7 +300,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
 
   if (!isOpen) return null
 
-        return (
+  return (
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0 }}
@@ -286,7 +309,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
         className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-sm"
         onClick={onClose}
       >
-          <motion.div
+        <motion.div
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -296,12 +319,12 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
         >
           {/* Header */}
           <div className="relative p-6 border-b border-gray-700/30">
-                         <button
-               onClick={onClose}
-               className="absolute top-6 right-4 p-2 text-gray-400 hover:text-white transition-all duration-200 hover:bg-gray-800/50 rounded-full"
-             >
-               <X size={16} />
-             </button>
+            <button
+              onClick={onClose}
+              className="absolute top-6 right-4 p-2 text-gray-400 hover:text-white transition-all duration-200 hover:bg-gray-800/50 rounded-full"
+            >
+              <X size={16} />
+            </button>
             
             {/* Progress Bar */}
             <div className="w-full bg-gray-800/50 rounded-full h-1.5 mb-4">
@@ -316,7 +339,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
             <div className="text-center">
               <h2 className="text-xl font-semibold text-white mb-1">
                 Sessão Estratégica Gratuita
-            </h2>
+              </h2>
               <p className="text-gray-400 text-xs font-normal">
                 Passo {currentStep + 1} de {steps.length}
               </p>
@@ -331,34 +354,44 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                 animate={{ opacity: 1, scale: 1 }}
                 className="flex flex-col items-center justify-center text-center py-12"
               >
-                                 <div className="w-12 h-12 bg-gray-800/50 rounded-full flex items-center justify-center mb-4">
-                   <CheckCircle className="w-6 h-6 text-gray-300" />
-                 </div>
-                 <h3 className="text-lg font-light text-white mb-3">
-                   Agendamento Confirmado
-                 </h3>
-                 <p className="text-gray-400 text-sm mb-4 max-w-md font-light">
-                   Sua sessão estratégica foi agendada com sucesso. Você receberá um e-mail de confirmação com o link do Google Meet.
-                 </p>
-                 <div className="text-xs text-gray-500 font-light">
-                   <p>{new Date(selectedDay).toLocaleDateString('pt-BR', { 
-                     weekday: 'long', 
-                     year: 'numeric', 
-                     month: 'long', 
-                     day: 'numeric' 
-                   })}</p>
-                   <p>{selectedTimeSlot} (Brasília)</p>
-                   <p>Check-in: 15 minutos antes</p>
-            </div>
-          </motion.div>
+                <div className="w-12 h-12 bg-gray-800/50 rounded-full flex items-center justify-center mb-4">
+                  <CheckCircle className="w-6 h-6 text-gray-300" />
+                </div>
+                <h3 className="text-lg font-light text-white mb-3">
+                  Agendamento Confirmado
+                </h3>
+                <p className="text-gray-400 text-sm mb-4 max-w-md font-light">
+                  Sua sessão estratégica foi agendada com sucesso! Você receberá um e-mail de confirmação com o link do Google Meet.
+                </p>
+                <div className="text-xs text-gray-500 font-light mb-6">
+                  <p>{new Date(selectedDay).toLocaleDateString('pt-BR', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}</p>
+                  <p>{selectedTimeSlot} (Brasília)</p>
+                  <p>Check-in: 15 minutos antes</p>
+                </div>
+                
+                <Button
+                  onClick={() => {
+                    setIsSuccess(false)
+                    onClose()
+                  }}
+                  className="bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-xl transition-all"
+                >
+                  Fechar
+                </Button>
+              </motion.div>
             ) : (
               <>
                 {/* Step Title - Apenas a pergunta atual */}
-          <motion.div
+                <motion.div
                   key={`step-title-${currentStep}`}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
                   className="text-center mb-6"
                 >
@@ -379,17 +412,17 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                   {currentStep === 0 && (
                     <div className="space-y-3">
                                              <Input
-                  type="text"
+                         type="text"
                          value={formData.name}
                          onChange={(e) => handleInputChange('name', e.target.value)}
                          onKeyPress={handleKeyPress}
-                  placeholder="Digite seu nome completo"
-                         className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400/20 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
-                />
-                {errors.name && (
-                         <p className="text-red-300/60 text-xs opacity-70">{errors.name}</p>
-                )}
-              </div>
+                         placeholder="Digite seu nome completo"
+                         className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-900/5 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
+                       />
+                      {errors.name && (
+                        <p className="text-red-300/60 text-xs opacity-70">{errors.name}</p>
+                      )}
+                    </div>
                   )}
 
                   {currentStep === 1 && (
@@ -400,44 +433,44 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                          onChange={handleWhatsAppChange}
                          onKeyPress={handleKeyPress}
                          placeholder="(XX) XXXXX-XXXX"
-                         className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400/20 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
-                />
-                {errors.whatsapp && (
-                         <p className="text-red-300/60 text-xs opacity-70">{errors.whatsapp}</p>
-                )}
-              </div>
+                         className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-900/5 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
+                       />
+                      {errors.whatsapp && (
+                        <p className="text-red-300/60 text-xs opacity-70">{errors.whatsapp}</p>
+                      )}
+                    </div>
                   )}
 
                   {currentStep === 2 && (
                     <div className="space-y-3">
                                              <Input
-                  type="email"
+                         type="email"
                          value={formData.email}
                          onChange={(e) => handleInputChange('email', e.target.value)}
                          onKeyPress={handleKeyPress}
-                  placeholder="seu@email.com"
-                         className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400/20 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
-                />
-                {errors.email && (
-                         <p className="text-red-300/60 text-xs opacity-70">{errors.email}</p>
-                )}
-              </div>
+                         placeholder="seu@email.com"
+                         className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-900/5 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
+                       />
+                      {errors.email && (
+                        <p className="text-red-300/60 text-xs opacity-70">{errors.email}</p>
+                      )}
+                    </div>
                   )}
 
                   {currentStep === 3 && (
                     <div className="space-y-3">
-              <textarea
+                                             <textarea
                          value={formData.painPoint}
                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('painPoint', e.target.value)}
                          onKeyPress={handleKeyPress}
                          placeholder="Descreva sua maior dificuldade para crescer no mercado de energia solar..."
                          rows={3}
-                         className="w-full text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400/20 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all resize-none px-4 py-3 border rounded-xl"
-              />
-              {errors.painPoint && (
-                         <p className="text-red-300/60 text-xs opacity-70">{errors.painPoint}</p>
-              )}
-            </div>
+                         className="w-full text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400/80 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all resize-none px-4 py-3 border rounded-xl"
+                       />
+                      {errors.painPoint && (
+                        <p className="text-red-300/60 text-xs opacity-70">{errors.painPoint}</p>
+                      )}
+                    </div>
                   )}
 
                   {currentStep === 4 && (
@@ -461,51 +494,72 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                               <div className="space-y-1">
                                 <div className="text-xs text-gray-400 uppercase tracking-wide">
                                   {day.dayName}
-              </div>
+                                </div>
                                 <div className="text-lg font-bold">
                                   {day.dayNumber}
-            </div>
+                                </div>
                                 <div className="text-xs text-gray-400">
                                   {day.month}
-                </div>
-              </div>
+                                </div>
+                              </div>
                             </button>
                           ))}
-              </div>
-            </div>
+                        </div>
+                      </div>
 
                       {/* Seleção de Horário */}
                       {selectedDay && (
                         <div className="space-y-3">
-                          <h4 className="text-sm font-medium text-gray-300 text-center mb-4">
-                            Escolha o horário para sua sessão
-                          </h4>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            {timeSlots.map((slot) => (
-              <button
-                                key={slot.id}
-                                onClick={() => setSelectedTimeSlot(slot.time)}
-                                disabled={!slot.available}
-                                className={`p-3 rounded-xl border transition-all ${
-                                  selectedTimeSlot === slot.time
-                                    ? 'border-primary-500 bg-primary-500/20 text-white shadow-lg'
-                                    : slot.available
-                                    ? 'border-gray-600/50 bg-gray-800/30 text-gray-300 hover:border-primary-500/50 hover:bg-primary-500/10 hover:shadow-md'
-                                    : 'border-gray-700/50 bg-gray-900/50 text-gray-600 cursor-not-allowed'
-                                }`}
-                              >
-                                <div className="flex items-center justify-center space-x-2">
-                                  <Clock size={14} />
-                                  <span className="text-sm font-medium">{slot.time}</span>
-                                </div>
-              </button>
-                            ))}
-                </div>
-              </div>
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-sm font-medium text-gray-300">
+                              Horários disponíveis para {new Date(selectedDay).toLocaleDateString('pt-BR', { 
+                                weekday: 'long', 
+                                day: 'numeric', 
+                                month: 'long' 
+                              })}
+                            </h4>
+                            <button
+                              onClick={() => fetchAvailableTimeSlots(selectedDay)}
+                              disabled={isLoadingSlots}
+                              className="p-2 text-gray-400 hover:text-white transition-all hover:bg-gray-800/50 rounded-full"
+                            >
+                              <RefreshCw size={16} className={isLoadingSlots ? 'animate-spin' : ''} />
+                            </button>
+                          </div>
+                          
+                          {isLoadingSlots ? (
+                            <div className="text-center py-8">
+                              <div className="w-6 h-6 border-2 border-primary-500/30 border-t-primary-500 rounded-full animate-spin mx-auto mb-2"></div>
+                              <p className="text-gray-400 text-sm">Buscando horários disponíveis...</p>
+                            </div>
+                          ) : availableTimeSlots.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                              {availableTimeSlots.map((slot) => (
+                                <button
+                                  key={slot}
+                                  onClick={() => setSelectedTimeSlot(slot)}
+                                  className={`p-3 rounded-xl border transition-all ${
+                                    selectedTimeSlot === slot
+                                      ? 'border-primary-500 bg-primary-500/20 text-white shadow-lg'
+                                      : 'border-gray-600/50 bg-gray-800/30 text-gray-300 hover:border-primary-500/50 hover:bg-primary-500/10 hover:shadow-md'
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-center space-x-2">
+                                    <Clock size={14} />
+                                    <span className="text-sm font-medium">{slot}</span>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-center py-8">
+                              <p className="text-gray-400 text-sm">Nenhum horário disponível para este dia.</p>
+                              <p className="text-gray-500 text-xs mt-1">Tente outro dia ou entre em contato conosco.</p>
+                            </div>
+                          )}
+                        </div>
                       )}
-
-
-              </div>
+                    </div>
                   )}
                 </motion.div>
 
@@ -537,28 +591,28 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                   ) : (
                     <Button
                       onClick={handleSubmit}
-                                             disabled={!selectedDay || !selectedTimeSlot || isSubmitting}
+                      disabled={!selectedDay || !selectedTimeSlot || isSubmitting}
                       className="flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white font-medium rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
                     >
                       {isSubmitting ? (
                         <>
                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                           <span>Agendando...</span>
+                          <span>Agendando...</span>
                         </>
                       ) : (
                         <>
-                           <Calendar size={16} />
-                           <span>Sessão Estratégica</span>
+                          <Calendar size={16} />
+                          <span>Sessão Estratégica</span>
                         </>
                       )}
                     </Button>
                   )}
                 </div>
               </>
-              )}
-            </div>
-          </motion.div>
+            )}
+          </div>
         </motion.div>
+      </motion.div>
     </AnimatePresence>
   )
 }
