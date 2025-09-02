@@ -120,9 +120,8 @@ Sessão estratégica gratuita para análise do negócio de energia solar e cria�
       // Continue processing even if Calendar fails
     }
 
-    // REMOVIDO: Envio de emails personalizados
-    // O Google Calendar envia emails nativos automaticamente para todos os participantes
-    // Isso inclui: confirmação para o lead, notificação para matheusdrarity@gmail.com e caiorarity@gmail.com
+    // O Google Calendar enviará automaticamente os emails nativos para todos os participantes
+    console.log('📧 Emails nativos do Google Calendar serão enviados automaticamente')
 
     // Simular processamento bem-sucedido
     await new Promise(resolve => setTimeout(resolve, 1000))
