@@ -4,19 +4,36 @@ import * as path from 'path'
 // Caminho para o arquivo JSON da conta de serviço
 const serviceAccountPath = path.join(process.cwd(), 'lp-rarity-oferta-energia-solar-d04cccf3789c.json')
 
-// Configurar autenticação com Service Account
+// Função para obter cliente OAuth2 para Google Calendar
+async function getOAuth2Client() {
+  const client = new google.auth.OAuth2(
+    process.env.GOOGLE_OAUTH_CLIENT_ID,
+    process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+    'https://developers.google.com/oauthplayground' // Redirect URI do OAuth Playground
+  );
+
+  // Para desenvolvimento, vamos usar um refresh token temporário
+  // Em produção, você precisará implementar o fluxo completo de OAuth2
+  if (process.env.GOOGLE_OAUTH_REFRESH_TOKEN) {
+    client.setCredentials({
+      refresh_token: process.env.GOOGLE_OAUTH_REFRESH_TOKEN
+    });
+  }
+
+  return client;
+}
+
+// Configurar autenticação com Service Account (apenas para Google Sheets)
 const auth = new google.auth.GoogleAuth({
   keyFile: serviceAccountPath,
   scopes: [
-    'https://www.googleapis.com/auth/spreadsheets',
-    'https://www.googleapis.com/auth/calendar',
-    'https://www.googleapis.com/auth/calendar.events'
+    'https://www.googleapis.com/auth/spreadsheets'
   ]
 })
 
 // Criar instâncias dos serviços Google
 const sheets = google.sheets({ version: 'v4', auth })
-const calendar = google.calendar({ version: 'v3', auth })
+// Calendar será criado dinamicamente com OAuth2
 
 export interface LeadData {
   sourcePage: string
@@ -114,20 +131,25 @@ export async function getAvailableTimeSlots(date: string): Promise<string[]> {
       return cached.slots
     }
 
-    // Obter horário atual em Brasília (otimizado)
+    // Obter horário atual em Brasília CORRETAMENTE
     const now = new Date()
-    const brasiliaTime = new Date(now.getTime() - (3 * 60 * 60 * 1000)) // UTC-3
+    // Brasília é UTC-3, então adicionamos 3 horas ao UTC para obter o horário local
+    const brasiliaTime = new Date(now.getTime() + (3 * 60 * 60 * 1000))
     
     // Verificar se é hoje
     const today = brasiliaTime.toISOString().split('T')[0]
     const isToday = date === today
     
+    console.log(`🕐 Horário atual em Brasília: ${brasiliaTime.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`)
+    console.log(`📅 Data solicitada: ${date}, É hoje? ${isToday}`)
+    
     // Se for hoje e já passou das 17h, não mostrar horários
     if (isToday) {
       const currentHour = brasiliaTime.getHours()
+      const currentMinute = brasiliaTime.getMinutes()
       
       if (currentHour >= 17) {
-        console.log(`🕐 Horário atual: ${currentHour}:00 - Já passou das 17h, não há horários disponíveis para hoje`)
+        console.log(`🕐 Horário atual: ${currentHour}:${currentMinute.toString().padStart(2, '0')} - Já passou das 17h, não há horários disponíveis para hoje`)
         timeSlotsCache.set(date, { slots: [], timestamp: Date.now() })
         return []
       }
@@ -138,16 +160,22 @@ export async function getAvailableTimeSlots(date: string): Promise<string[]> {
     
     let availableSlots = [...baseSlots]
     
-    // Se for hoje, filtrar horários que já passaram (lógica simplificada)
+    // Se for hoje, filtrar horários que já passaram com buffer de 2 horas
     if (isToday) {
       const currentHour = brasiliaTime.getHours()
+      const currentMinute = brasiliaTime.getMinutes()
+      
+      // Buffer de 2 horas para garantir que o lead tenha tempo de se preparar
+      const bufferHours = 2
+      const cutoffHour = currentHour + bufferHours
       
       availableSlots = baseSlots.filter(slot => {
         const slotHour = parseInt(slot.split(':')[0])
-        return slotHour > (currentHour + 1) // Buffer de 1 hora
+        return slotHour > cutoffHour
       })
       
-      console.log(`🕐 Horário atual: ${currentHour}:00 - Horários disponíveis para hoje: ${availableSlots.length}`)
+      console.log(`🕐 Horário atual: ${currentHour}:${currentMinute.toString().padStart(2, '0')} - Horários disponíveis para hoje (buffer de ${bufferHours}h): ${availableSlots.length}`)
+      console.log(`📋 Horários filtrados:`, availableSlots)
     }
     
     // Salvar no cache imediatamente
@@ -160,9 +188,12 @@ export async function getAvailableTimeSlots(date: string): Promise<string[]> {
     console.error('❌ Erro ao buscar horários disponíveis:', error)
     
     // Fallback instantâneo - sempre retornar horários padrão para datas futuras
-    const today = new Date().toISOString().split('T')[0]
+    const now = new Date()
+    const brasiliaTime = new Date(now.getTime() + (3 * 60 * 60 * 1000))
+    const today = brasiliaTime.toISOString().split('T')[0]
+    
     if (date === today) {
-      const currentHour = new Date().getHours()
+      const currentHour = brasiliaTime.getHours()
       if (currentHour >= 17) {
         return []
       }
@@ -175,10 +206,13 @@ export async function getAvailableTimeSlots(date: string): Promise<string[]> {
 
 export async function createCalendarEvent(eventData: CalendarEvent): Promise<{ eventId: string; meetLink: string }> {
   try {
+    const oauth2Client = await getOAuth2Client();
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
     // Usar o email do calendário do matheusdrarity@gmail.com
     const calendarId = 'matheusdrarity@gmail.com'
     
-    console.log('📅 Tentando criar evento no calendário:', calendarId)
+    console.log('📅 Tentando criar evento no calendário usando OAuth2:', calendarId)
     console.log('📝 Dados do evento:', JSON.stringify(eventData, null, 2))
     
     // Criar evento no Google Calendar
@@ -242,10 +276,13 @@ export async function createCalendarEvent(eventData: CalendarEvent): Promise<{ e
 
 export async function testGoogleCalendarConnection(): Promise<boolean> {
   try {
+    const oauth2Client = await getOAuth2Client();
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
     // Usar o email do calendário do matheusdrarity@gmail.com
     const calendarId = 'matheusdrarity@gmail.com'
     
-    console.log('📅 Testando conexão com calendário:', calendarId)
+    console.log('📅 Testando conexão com calendário usando OAuth2:', calendarId)
     
     // Tentar listar eventos para testar conexão
     const response = await calendar.events.list({
@@ -259,6 +296,16 @@ export async function testGoogleCalendarConnection(): Promise<boolean> {
     
   } catch (error) {
     console.error('❌ Erro ao testar conexão com Google Calendar:', error)
+    
+    // Se não tiver refresh token, dar instruções
+    if (!process.env.GOOGLE_OAUTH_REFRESH_TOKEN) {
+      console.log('⚠️ GOOGLE_OAUTH_REFRESH_TOKEN não configurado')
+      console.log('📋 Para obter o refresh token:')
+      console.log('1. Acesse: https://script.google.com/')
+      console.log('2. Faça login com matheusdrarity@gmail.com')
+      console.log('3. Crie um novo projeto e teste os escopos')
+    }
+    
     throw error
   }
 }
