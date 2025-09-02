@@ -206,7 +206,7 @@ export async function getAvailableTimeSlots(date: string): Promise<string[]> {
       })
       
       // Remover duplicatas
-      busySlots = [...new Set(busySlots)]
+      busySlots = Array.from(new Set(busySlots))
       console.log(`🚫 Horários ocupados: ${busySlots.join(', ')}`)
       
     } catch (calendarError) {
