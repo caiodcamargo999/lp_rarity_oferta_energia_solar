@@ -118,13 +118,32 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
   // Buscar horários disponíveis quando um dia for selecionado
   useEffect(() => {
     if (selectedDay) {
-      // Mostrar horários padrão INSTANTANEAMENTE
+      // Mostrar horários padrão de forma imediata, já filtrando horários passados em Brasília
       const defaultSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00']
-      setAvailableTimeSlots(defaultSlots)
-      setIsLoadingSlots(false)
-      
-      // DESABILITADO TEMPORARIAMENTE - API está travando
-      // fetchAvailableTimeSlots(selectedDay)
+
+      try {
+        const nowUtc = new Date()
+        // Converter para horário de Brasília (UTC-3)
+        const brasiliaNow = new Date(nowUtc.getTime() + (3 * 60 * 60 * 1000))
+        const todayInBrasilia = brasiliaNow.toISOString().split('T')[0]
+        const isToday = selectedDay === todayInBrasilia
+
+        let immediateSlots = defaultSlots
+        if (isToday) {
+          const bufferHours = 2
+          const cutoffHour = brasiliaNow.getHours() + bufferHours
+          immediateSlots = defaultSlots.filter((slot) => {
+            const slotHour = parseInt(slot.split(':')[0])
+            return slotHour > cutoffHour
+          })
+        }
+        setAvailableTimeSlots(immediateSlots)
+      } catch {
+        setAvailableTimeSlots(defaultSlots)
+      }
+
+      // Buscar da API para ter a fonte de verdade (também filtra no backend)
+      fetchAvailableTimeSlots(selectedDay)
     }
   }, [selectedDay])
 
