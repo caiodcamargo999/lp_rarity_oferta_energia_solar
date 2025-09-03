@@ -115,34 +115,19 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
     }
   }, [isOpen])
 
-  // Buscar horários disponíveis quando um dia for selecionado
+  // Buscar horários disponíveis quando um dia for selecionado (sem fallback local)
   useEffect(() => {
     if (selectedDay) {
-      // Mostrar horários padrão de forma imediata, já filtrando horários passados em Brasília
-      const defaultSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00']
-
-      try {
-        const nowUtc = new Date()
-        // Converter para horário de Brasília (UTC-3)
-        const brasiliaNow = new Date(nowUtc.getTime() + (3 * 60 * 60 * 1000))
-        const todayInBrasilia = brasiliaNow.toISOString().split('T')[0]
-        const isToday = selectedDay === todayInBrasilia
-
-        let immediateSlots = defaultSlots
-        if (isToday) {
-          const bufferHours = 2
-          const cutoffHour = brasiliaNow.getHours() + bufferHours
-          immediateSlots = defaultSlots.filter((slot) => {
-            const slotHour = parseInt(slot.split(':')[0])
-            return slotHour > cutoffHour
-          })
-        }
-        setAvailableTimeSlots(immediateSlots)
-      } catch {
-        setAvailableTimeSlots(defaultSlots)
+      setIsLoadingSlots(true)
+      setAvailableTimeSlots([])
+      
+      // Se for hoje, limpar cache primeiro para garantir dados atualizados
+      const today = new Date().toISOString().split('T')[0]
+      if (selectedDay === today) {
+        // Limpar cache do servidor
+        fetch('/api/clear-cache', { method: 'POST' }).catch(console.error)
       }
-
-      // Buscar da API para ter a fonte de verdade (também filtra no backend)
+      
       fetchAvailableTimeSlots(selectedDay)
     }
   }, [selectedDay])
@@ -150,7 +135,16 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
   const fetchAvailableTimeSlots = async (date: string) => {
     setIsLoadingSlots(true)
     try {
-      const response = await fetch(`/api/leads?date=${date}`)
+      // Timeout de 5 segundos para a requisição
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000)
+      
+      const response = await fetch(`/api/leads?date=${date}`, {
+        signal: controller.signal
+      })
+      
+      clearTimeout(timeoutId)
+      
       if (response.ok) {
         const data = await response.json()
         setAvailableTimeSlots(data.availableSlots || [])
@@ -160,7 +154,9 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
       }
     } catch (error) {
       console.error('Erro ao buscar horários disponíveis:', error)
-      setAvailableTimeSlots([])
+      // Fallback: mostrar horários padrão se der timeout
+      const defaultSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00']
+      setAvailableTimeSlots(defaultSlots)
     } finally {
       setIsLoadingSlots(false)
     }

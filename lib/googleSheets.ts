@@ -170,9 +170,15 @@ export async function testGoogleSheetsConnection(): Promise<boolean> {
   }
 }
 
-// Cache para horários disponíveis (5 minutos para horários dinâmicos)
+// Cache para horários disponíveis (1 minuto para horários dinâmicos - mais agressivo)
 const timeSlotsCache = new Map<string, { slots: string[], timestamp: number }>()
-const CACHE_DURATION = 5 * 60 * 1000 // 5 minutos
+const CACHE_DURATION = 1 * 60 * 1000 // 1 minuto
+
+// Função para limpar cache (útil para debug)
+export function clearTimeSlotsCache() {
+  timeSlotsCache.clear()
+  console.log('🧹 Cache de horários limpo')
+}
 
 export async function getAvailableTimeSlots(date: string): Promise<string[]> {
   try {
@@ -183,17 +189,22 @@ export async function getAvailableTimeSlots(date: string): Promise<string[]> {
       return cached.slots
     }
 
-    // Obter horário atual em Brasília CORRETAMENTE
+    // Fallback rápido para datas futuras (não hoje)
     const now = new Date()
-    // Brasília é UTC-3, então adicionamos 3 horas ao UTC para obter o horário local
-    const brasiliaTime = new Date(now.getTime() + (3 * 60 * 60 * 1000))
-    
-    // Verificar se é hoje
+    const brasiliaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}))
     const today = brasiliaTime.toISOString().split('T')[0]
     const isToday = date === today
     
-    console.log(`🕐 Horário atual em Brasília: ${brasiliaTime.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`)
-    console.log(`📅 Data solicitada: ${date}, É hoje? ${isToday}`)
+    if (!isToday) {
+      // Para datas futuras, retornar horários padrão imediatamente
+      const baseSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00']
+      timeSlotsCache.set(date, { slots: baseSlots, timestamp: Date.now() })
+      return baseSlots
+    }
+
+
+    
+
     
     // Se for hoje e já passou das 17h, não mostrar horários
     if (isToday) {
@@ -201,7 +212,6 @@ export async function getAvailableTimeSlots(date: string): Promise<string[]> {
       const currentMinute = brasiliaTime.getMinutes()
       
       if (currentHour >= 17) {
-        console.log(`🕐 Horário atual: ${currentHour}:${currentMinute.toString().padStart(2, '0')} - Já passou das 17h, não há horários disponíveis para hoje`)
         timeSlotsCache.set(date, { slots: [], timestamp: Date.now() })
         return []
       }
@@ -210,30 +220,37 @@ export async function getAvailableTimeSlots(date: string): Promise<string[]> {
     // Definir horários base (9h às 17h)
     const baseSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00']
     
-    // Buscar eventos existentes no Google Calendar para a data solicitada
+    // Buscar eventos existentes no Google Calendar para a data solicitada (com timeout)
     let busySlots: string[] = []
     try {
-      const oauth2Client = await getOAuth2Client()
-      const calendar = google.calendar({ version: 'v3', auth: oauth2Client })
+      // Timeout de 3 segundos para a consulta do Calendar
+      const calendarPromise = (async () => {
+        const oauth2Client = await getOAuth2Client()
+        const calendar = google.calendar({ version: 'v3', auth: oauth2Client })
+        
+        // Criar range de tempo para o dia solicitado
+        const startOfDay = new Date(`${date}T00:00:00-03:00`) // Início do dia em Brasília
+        const endOfDay = new Date(`${date}T23:59:59-03:00`)   // Fim do dia em Brasília
+        
+        // Buscar eventos no calendário do matheusdrarity@gmail.com (otimizado)
+        const response = await calendar.events.list({
+          calendarId: 'matheusdrarity@gmail.com',
+          timeMin: startOfDay.toISOString(),
+          timeMax: endOfDay.toISOString(),
+          singleEvents: true,
+          orderBy: 'startTime',
+          maxResults: 20 // Reduzido para 20 eventos para performance
+        })
+        
+        return response.data.items || []
+      })()
       
-      // Criar range de tempo para o dia solicitado
-      const startOfDay = new Date(`${date}T00:00:00-03:00`) // Início do dia em Brasília
-      const endOfDay = new Date(`${date}T23:59:59-03:00`)   // Fim do dia em Brasília
+      // Timeout de 3 segundos
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), 3000)
+      )
       
-      console.log(`📅 Buscando eventos no calendário para ${date}`)
-      console.log(`🕐 Range: ${startOfDay.toISOString()} até ${endOfDay.toISOString()}`)
-      
-      // Buscar eventos no calendário do matheusdrarity@gmail.com
-      const response = await calendar.events.list({
-        calendarId: 'matheusdrarity@gmail.com',
-        timeMin: startOfDay.toISOString(),
-        timeMax: endOfDay.toISOString(),
-        singleEvents: true,
-        orderBy: 'startTime'
-      })
-      
-      const events = response.data.items || []
-      console.log(`📋 Encontrados ${events.length} eventos no calendário para ${date}`)
+      const events = await Promise.race([calendarPromise, timeoutPromise]) as any[]
       
       // Extrair horários ocupados
       events.forEach(event => {
@@ -253,13 +270,12 @@ export async function getAvailableTimeSlots(date: string): Promise<string[]> {
             }
           }
           
-          console.log(`📅 Evento: ${event.summary} - ${startHour}:00 às ${endHour}:00`)
+
         }
       })
       
       // Remover duplicatas
       busySlots = Array.from(new Set(busySlots))
-      console.log(`🚫 Horários ocupados: ${busySlots.join(', ')}`)
       
     } catch (calendarError) {
       console.error('❌ Erro ao buscar eventos no calendário:', calendarError)
@@ -271,6 +287,9 @@ export async function getAvailableTimeSlots(date: string): Promise<string[]> {
     
     // Se for hoje, filtrar horários que já passaram com buffer de 2 horas
     if (isToday) {
+      // Usar horário correto de Brasília - método mais confiável
+      const now = new Date()
+      const brasiliaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}))
       const currentHour = brasiliaTime.getHours()
       const currentMinute = brasiliaTime.getMinutes()
       
@@ -278,17 +297,24 @@ export async function getAvailableTimeSlots(date: string): Promise<string[]> {
       const bufferHours = 2
       const cutoffHour = currentHour + bufferHours
       
+      console.log(`🕐 Horário atual em Brasília: ${currentHour}:${currentMinute.toString().padStart(2, '0')}`)
+      console.log(`⏰ Cutoff hour (com buffer de ${bufferHours}h): ${cutoffHour}`)
+      console.log(`📋 Horários antes do filtro: ${availableSlots.join(', ')}`)
+      
       availableSlots = availableSlots.filter(slot => {
         const slotHour = parseInt(slot.split(':')[0])
-        return slotHour > cutoffHour
+        const isAvailable = slotHour > cutoffHour
+        console.log(`📅 Slot ${slot} (hora ${slotHour}): ${isAvailable ? '✅ Disponível' : '❌ Passou (cutoff: ${cutoffHour})'}`)
+        return isAvailable
       })
       
-      console.log(`🕐 Horário atual: ${currentHour}:${currentMinute.toString().padStart(2, '0')} - Horários disponíveis para hoje (buffer de ${bufferHours}h): ${availableSlots.length}`)
+      console.log(`📋 Horários após filtro: ${availableSlots.join(', ')}`)
     }
+    // Para datas futuras, não filtrar por horário atual - mostrar todos os horários disponíveis
     
-    console.log(`📋 Horários disponíveis para ${date}:`, availableSlots)
+
     
-    // Salvar no cache com duração menor para horários dinâmicos (5 minutos)
+    // Salvar no cache com duração menor para horários dinâmicos (2 minutos)
     timeSlotsCache.set(date, { slots: availableSlots, timestamp: Date.now() })
     
     return availableSlots
@@ -298,16 +324,30 @@ export async function getAvailableTimeSlots(date: string): Promise<string[]> {
     
     // Fallback instantâneo - sempre retornar horários padrão para datas futuras
     const now = new Date()
-    const brasiliaTime = new Date(now.getTime() + (3 * 60 * 60 * 1000))
+    const brasiliaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}))
     const today = brasiliaTime.toISOString().split('T')[0]
     
+    // Se for hoje e já passou das 17h, não mostrar horários
     if (date === today) {
       const currentHour = brasiliaTime.getHours()
       if (currentHour >= 17) {
         return []
       }
+      
+      // Se for hoje, filtrar horários passados com buffer de 2h
+      const bufferHours = 2
+      const cutoffHour = currentHour + bufferHours
+      const fallbackSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00']
+      console.log(`🚨 FALLBACK - Horário atual: ${currentHour}, Cutoff: ${cutoffHour}`)
+      return fallbackSlots.filter(slot => {
+        const slotHour = parseInt(slot.split(':')[0])
+        const isAvailable = slotHour > cutoffHour
+        console.log(`🚨 FALLBACK - Slot ${slot}: ${isAvailable ? '✅' : '❌'}`)
+        return isAvailable
+      })
     }
     
+    // Para datas futuras, mostrar todos os horários
     const fallbackSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00']
     return fallbackSlots
   }
