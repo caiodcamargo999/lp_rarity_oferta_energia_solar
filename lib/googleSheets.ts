@@ -1,8 +1,32 @@
 import { google } from 'googleapis'
 import * as path from 'path'
 
-// Caminho para o arquivo JSON da conta de serviço
-const serviceAccountPath = path.join(process.cwd(), 'lp-rarity-oferta-energia-solar-d04cccf3789c.json')
+// Configuração da conta de serviço - usar variáveis de ambiente em produção
+const getServiceAccountConfig = () => {
+  // Em produção, usar variáveis de ambiente
+  if (process.env.NODE_ENV === 'production') {
+    if (!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !process.env.GOOGLE_PRIVATE_KEY) {
+      throw new Error('Variáveis de ambiente GOOGLE_SERVICE_ACCOUNT_EMAIL e GOOGLE_PRIVATE_KEY são obrigatórias em produção')
+    }
+    
+    return {
+      type: 'service_account',
+      project_id: process.env.GOOGLE_PROJECT_ID || 'lp-rarity-oferta-energia-solar',
+      private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID || '',
+      private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      client_id: process.env.GOOGLE_CLIENT_ID || '',
+      auth_uri: 'https://accounts.google.com/o/oauth2/auth',
+      token_uri: 'https://oauth2.googleapis.com/token',
+      auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
+      client_x509_cert_url: `https://www.googleapis.com/robot/v1/metadata/x509/${process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL}`
+    }
+  }
+  
+  // Em desenvolvimento, usar arquivo físico
+  const serviceAccountPath = path.join(process.cwd(), 'lp-rarity-oferta-energia-solar-d04cccf3789c.json')
+  return serviceAccountPath
+}
 
 // Função para obter cliente OAuth2 para Google Calendar
 async function getOAuth2Client() {
@@ -18,18 +42,46 @@ async function getOAuth2Client() {
     client.setCredentials({
       refresh_token: process.env.GOOGLE_OAUTH_REFRESH_TOKEN
     });
+    
+    // Verificar se o token ainda é válido
+    try {
+      await client.getAccessToken();
+      console.log('✅ OAuth2 token válido');
+    } catch (tokenError) {
+      console.error('❌ OAuth2 token expirado ou inválido:', tokenError);
+      throw new Error('OAuth2 token expirado. É necessário gerar um novo refresh token.');
+    }
+  } else {
+    throw new Error('GOOGLE_OAUTH_REFRESH_TOKEN não configurado');
   }
 
   return client;
 }
 
 // Configurar autenticação com Service Account (apenas para Google Sheets)
-const auth = new google.auth.GoogleAuth({
-  keyFile: serviceAccountPath,
-  scopes: [
-    'https://www.googleapis.com/auth/spreadsheets'
-  ]
-})
+const getAuth = () => {
+  const serviceAccountConfig = getServiceAccountConfig()
+  
+  if (typeof serviceAccountConfig === 'string') {
+    // Desenvolvimento - usar arquivo
+    return new google.auth.GoogleAuth({
+      keyFile: serviceAccountConfig,
+      scopes: [
+        'https://www.googleapis.com/auth/spreadsheets'
+      ]
+    })
+  } else {
+    // Produção - usar objeto de credenciais
+    return new google.auth.GoogleAuth({
+      credentials: serviceAccountConfig,
+      scopes: [
+        'https://www.googleapis.com/auth/spreadsheets'
+      ]
+    })
+  }
+}
+
+const auth = getAuth()
 
 // Criar instâncias dos serviços Google
 const sheets = google.sheets({ version: 'v4', auth })
@@ -309,7 +361,8 @@ export async function createCalendarEvent(eventData: CalendarEvent): Promise<{ e
       calendarId,
       requestBody: event,
       conferenceDataVersion: 1,
-      sendUpdates: 'all' // IMPORTANTE: Envia emails para todos os participantes
+      sendUpdates: 'all', // IMPORTANTE: Envia emails para todos os participantes
+      sendNotifications: true // Força o envio de notificações
     })
     
     const eventId = response.data.id || ''
@@ -317,6 +370,18 @@ export async function createCalendarEvent(eventData: CalendarEvent): Promise<{ e
     
     console.log('✅ Evento criado no Google Calendar:', eventId)
     console.log('🔗 Link do Google Meet:', meetLink)
+    console.log('📧 Emails enviados para participantes:', eventData.attendees)
+    console.log('📋 Resposta completa da API:', JSON.stringify(response.data, null, 2))
+    
+    // Verificar se o evento foi criado com sucesso
+    if (!eventId) {
+      throw new Error('Evento não foi criado - ID não retornado')
+    }
+    
+    // Verificar se o link do Meet foi gerado
+    if (!meetLink) {
+      console.warn('⚠️ Link do Google Meet não foi gerado')
+    }
     
     return { eventId, meetLink }
     

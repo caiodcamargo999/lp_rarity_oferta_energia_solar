@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "lp-rarity-oferta-energia-solar",
+  "private_key_id": "5986b53018d33d98b28a2bd4a2ced04616f25889",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDO3y02p13wrYJi\nCAlBdCIgO+j0p+8b4IdnyPjIThY7rfbGmx/5ht8HrINwhhycxnIiIDZ9kkTYfqdH\n37dsyI5h7TdV71DYCCadIvVD5eCvDsy3LXA033YIiCJyGXAfX+pY69Ffod77Je38\n5PgC1hjgn4xCwIqonUzYh35dzNvgVEhSC1msd4juBlOTAfVwNSJbeLuCkAex/1Rt\nAo/Vt+7YW4P+9qoPXfaCc8FFLWBCZ7Cofh82ZftJ73SioQmkDwa4ZZxSCuV3GICc\n1Qqsd1ZUfhTZexqxveXqhojaWj4rE/lPlT9sWxCZcpVgnuIEo3m5cNC9ZIX153Yu\nem9R6aXvAgMBAAECggEAGptyIsXrBgd4WL3PhvIgvi7xGvU11/WMejOglTlp5aTN\n3nnZkSFLh/P5zIa19mTAYursEew2sPZf80AZxO2Uq+az8nhp2FH6uW+OG9IHZddM\nSuvBXfjhzbNzZA5+hnfdLzEBcxXhlUF/IcLyB9db8sQX6QaqWYkwducSazkWjKcU\nWHa7ADDQIWyEBml2WKRvtazjctqMDSm27b8KivhFPZIu8stYwhT8XchkiTh/aOZx\ncmeh0WnLkflbzppIDJ8SGIIjhfI5gSvCywNhk17iOkPdLicBN3llqg23Z162unGL\nlADGQjJwTHZWBxi5ScRMsP7yoto24UmrguYIysI0uQKBgQD8tMc7QKaFp8mTQ70b\nrvapq7QrpqrJ9FVf82TUln1zz04cdVDtWVNNNPy0QwnlZXr6pVmyFvYFr17cC+tK\nqM05CQbOTxEPlSJLw/+NogEhHyN/juona6s7dLtLjJAp8hfLU8kYaA+OkYua+fBe\nwPDD8zHrk/IF+q/6D9nTkgPliQKBgQDRkXWuDUSUMPaWE4Zoep0FIKsFfh7yzgkn\nglvX7T+Q/j9sqTBG2C0OydNJhMMZeOICi8xPFbM4kCUPVudFYUdhSM+0/RYq9Zae\n5fqrbfkC+ctGg59E3Yc/9iodJ2B/SOf+F6/13h+BhH/J7nOU81wZWytfdfc/mGTW\n6nq8QKjJtwKBgQCKbomZVuAh5XlSF9B3YtAywCGxq9pxSUyfhFie8FWG5HA4vLd5\nXe55I+au5O594KqOtZe+LD/Xe2suhcT+IBxT+zLkP4HsFFk2QgczUiTmPQWYMfTp\nZVzm9BpJ15V9tOX990b4/MBQ7EAaxII9ldoOraGSGHiDeAGArcA42wsRaQKBgQCF\n2YPyEONWSxeTrxDPtlCHr9/LeExIBDRwmaATf6Jz9w+HVWBSP0w3/8wFTthVcpHX\n0nZBpLh9TgN9kqHP/Fvc1OZk0KjR812qS3UY/PpoXibo+LRHBb6WqaEoUbgeU/Bo\np7RpMt+ol3oO/U+xOOYAA+zl4bBzW+A8LDML/bhQbQKBgA7BQq7TJiT6bF0L12et\nXsDWdD3lPJN4tqhUhI4wnRM0dZh3WrYvk0IM5QFfQ/phsmoghVDooA1nnqwNlKKd\nfhSiuubR/zqkvUSAGnilumKdOObfmDV6NU34xJWrNljuwoexzH/8eIDIvzvs+omh\nBQdepn3XcXa1f/RVrF26MkMQ\n-----END PRIVATE KEY-----\n",
+  "client_email": "matheusdrarity@lp-rarity-oferta-energia-solar.iam.gserviceaccount.com",
+  "client_id": "114079786091086935440",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/matheusdrarity%40lp-rarity-oferta-energia-solar.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

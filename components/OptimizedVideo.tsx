@@ -26,6 +26,7 @@ export default function OptimizedVideo({
   const [isPlaying, setIsPlaying] = useState(false)
   const [isVideoLoaded, setIsVideoLoaded] = useState(false)
   const [showPlayButton, setShowPlayButton] = useState(true)
+  const [showPauseButton, setShowPauseButton] = useState(false)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const [currentTime, setCurrentTime] = useState(0)
@@ -63,6 +64,13 @@ export default function OptimizedVideo({
       await video.play()
       setIsPlaying(true)
       setShowPlayButton(false)
+      
+      // Mostrar botão de pause por 2 segundos
+      setShowPauseButton(true)
+      setTimeout(() => {
+        setShowPauseButton(false)
+      }, 2000)
+      
       onPlay?.()
     } catch (error) {
       console.error('Erro ao reproduzir vídeo:', error)
@@ -72,6 +80,13 @@ export default function OptimizedVideo({
         await video.play()
         setIsPlaying(true)
         setShowPlayButton(false)
+        
+        // Mostrar botão de pause por 2 segundos
+        setShowPauseButton(true)
+        setTimeout(() => {
+          setShowPauseButton(false)
+        }, 2000)
+        
         onPlay?.()
       } catch (retryError) {
         console.error('Erro na segunda tentativa:', retryError)
@@ -87,6 +102,7 @@ export default function OptimizedVideo({
     video.pause()
     setIsPlaying(false)
     setShowPlayButton(true)
+    setShowPauseButton(false) // Esconder botão de pause ao pausar
     onPause?.()
   }
 
@@ -103,6 +119,13 @@ export default function OptimizedVideo({
       handlePause()
     } else {
       handlePlay()
+    }
+  }
+
+  const handleVideoDoubleClick = () => {
+    // Permitir pausar com duplo clique quando o botão não está visível
+    if (isPlaying && !showPauseButton) {
+      handlePause()
     }
   }
 
@@ -141,6 +164,7 @@ export default function OptimizedVideo({
       <div
         className="absolute inset-0 flex items-center justify-center cursor-pointer"
         onClick={handleVideoClick}
+        onDoubleClick={handleVideoDoubleClick}
       >
         <AnimatePresence>
           {showPlayButton && !isLoading && (
@@ -159,13 +183,15 @@ export default function OptimizedVideo({
           )}
         </AnimatePresence>
 
+
+
         <AnimatePresence>
-          {isPlaying && (
+          {showPauseButton && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/20 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="absolute inset-0 flex items-center justify-center z-20"
             >
               <button
                 className="w-16 h-16 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 hover:scale-110 transition-all duration-200"
@@ -179,6 +205,8 @@ export default function OptimizedVideo({
             </motion.div>
           )}
         </AnimatePresence>
+
+
       </div>
     </div>
   )

@@ -8,6 +8,18 @@ R2_BUCKET_NAME=vsl-solar-rarity-brasil
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NODE_ENV=development
 
+# ===== GOOGLE OAUTH2 (NOVO) =====
+GOOGLE_OAUTH_CLIENT_ID=384658893111-9a9ff4ik2173sl7jp53f85m4ia26vt50.apps.googleusercontent.com
+GOOGLE_OAUTH_CLIENT_SECRET=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
+GOOGLE_OAUTH_REFRESH_TOKEN=1//04IcnrCGyaJrVCgYIARAAGAQSNwF-L9IrP6vWL5LltDXNs1gVVXhgrCfb-DLgmm9xm6TUweFJyE_5Treohfkq2LdtHtH8Qk8cios
+
+# ===== GOOGLE SERVICES (MANTENHA) =====
+GOOGLE_SPREADSHEET_ID=17SzKfUugqko4XZyp10WYc7GOaN7nt__vNW5PjPp5pKw
+
+# ===== EMAIL (MANTENHA) =====
+SMTP_USER=matheusdrarity@gmail.com
+SMTP_PASS=zyll pdpf bqlb klvc
+
 # ===== EXPLICAÇÃO =====
 # NEXT_PUBLIC_SITE_URL=http://localhost:3000 - Para desenvolvimento local
 # NEXT_PUBLIC_VIDEO_URL - URL do vídeo no Cloudflare R2 (funciona em ambos)
