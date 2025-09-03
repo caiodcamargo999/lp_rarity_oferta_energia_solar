@@ -48,24 +48,24 @@ export async function GET(request: NextRequest) {
         calendarsFound: calendarList.data.items?.length || 0,
         envCheck
       })
-    } catch (calendarError) {
-      console.error('❌ Erro Google Calendar:', calendarError)
-      
-      return NextResponse.json({
-        success: false,
-        error: 'Erro ao acessar Google Calendar',
-        calendarError: calendarError.message,
-        envCheck
-      }, { status: 500 })
-    }
+         } catch (calendarError) {
+       console.error('❌ Erro Google Calendar:', calendarError)
+       
+       return NextResponse.json({
+         success: false,
+         error: 'Erro ao acessar Google Calendar',
+         calendarError: calendarError instanceof Error ? calendarError.message : String(calendarError),
+         envCheck
+       }, { status: 500 })
+     }
     
-  } catch (error) {
-    console.error('❌ Erro geral OAuth2:', error)
-    
-    return NextResponse.json({
-      success: false,
-      error: 'Erro geral OAuth2',
-      details: error.message
-    }, { status: 500 })
-  }
+     } catch (error) {
+     console.error('❌ Erro geral OAuth2:', error)
+     
+     return NextResponse.json({
+       success: false,
+       error: 'Erro geral OAuth2',
+       details: error instanceof Error ? error.message : String(error)
+     }, { status: 500 })
+   }
 }
