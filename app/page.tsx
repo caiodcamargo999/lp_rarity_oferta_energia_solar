@@ -59,7 +59,7 @@ export default function HomePage() {
           <h1 className="text-h1 font-bold text-text-primary mb-6 leading-tight tracking-tight">
             <span className="gradient-text">DOBRE</span> suas Vendas de Placas Solares<br/>
             <span className="text-h3 font-semibold text-text-secondary mt-4 block">
-              em 60 dias
+              em 90 dias
             </span>
           </h1>
           

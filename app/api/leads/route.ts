@@ -6,9 +6,11 @@ interface RequestData {
   whatsapp: string
   email: string
   painPoint: string
-  scheduledDate: string
-  scheduledTime: string
+  budget: string
+  scheduledDate: string | null
+  scheduledTime: string | null
   sourcePage?: string
+  hasBudget?: string
 }
 
 export async function POST(request: NextRequest) {
@@ -16,9 +18,17 @@ export async function POST(request: NextRequest) {
     const requestData: RequestData = await request.json()
 
     // Validação básica
-    if (!requestData.name || !requestData.email || !requestData.whatsapp || !requestData.painPoint || !requestData.scheduledDate || !requestData.scheduledTime) {
+    if (!requestData.name || !requestData.email || !requestData.whatsapp || !requestData.painPoint || !requestData.budget) {
       return NextResponse.json(
         { error: 'Todos os campos são obrigatórios' },
+        { status: 400 }
+      )
+    }
+
+    // Se tem orçamento, precisa ter data e hora agendada
+    if (requestData.hasBudget === 'sim' && (!requestData.scheduledDate || !requestData.scheduledTime)) {
+      return NextResponse.json(
+        { error: 'Data e horário são obrigatórios para agendamento' },
         { status: 400 }
       )
     }
@@ -56,8 +66,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create scheduled date time string
-    const scheduledDateTime = `${requestData.scheduledDate} ${requestData.scheduledTime}`
+    // Create scheduled date time string (only if has budget)
+    const scheduledDateTime = requestData.scheduledDate && requestData.scheduledTime 
+      ? `${requestData.scheduledDate} ${requestData.scheduledTime}`
+      : 'Não agendado'
 
     // Prepare lead data for Google Sheets
     const leadData: LeadData = {
@@ -66,6 +78,7 @@ export async function POST(request: NextRequest) {
       whatsapp: requestData.whatsapp.trim(),
       email: requestData.email.trim(),
       painPoint: requestData.painPoint.trim(),
+      hasBudget: requestData.hasBudget || (requestData.budget === 'Sim, tenho.' ? 'sim' : 'não'),
       scheduledDateTime,
       timestamp: new Date().toISOString()
     }
@@ -75,53 +88,60 @@ export async function POST(request: NextRequest) {
     console.log('📧 Email:', leadData.email)
     console.log('📱 WhatsApp:', leadData.whatsapp)
     console.log('🎯 Dor principal:', leadData.painPoint)
+    console.log('💰 Tem orçamento:', leadData.hasBudget)
     console.log('📅 Data/Hora agendada:', scheduledDateTime)
 
     // 1. Add lead to Google Sheets
     try {
-      await addLeadToSheet(leadData)
-      console.log('✅ Lead salvo no Google Sheets com sucesso')
+      console.log('📊 Tentando salvar no Google Sheets:', leadData)
+      const sheetsResult = await addLeadToSheet(leadData)
+      console.log('✅ Lead salvo no Google Sheets com sucesso:', sheetsResult)
     } catch (sheetsError) {
       console.error('❌ Erro ao salvar no Google Sheets:', sheetsError)
+      if (sheetsError instanceof Error) {
+        console.error('❌ Detalhes do erro:', sheetsError.message)
+      }
       // Continue processing even if Sheets fails
     }
 
-    // 2. Create Google Calendar event
+    // 2. Create Google Calendar event (only if has budget)
     let eventId = ''
     let meetLink = ''
     
-    try {
-      const eventData = {
-        summary: `Sessão Estratégica - ${leadData.name}`,
-        description: `Sessão estratégica com ${leadData.name} (${leadData.email})
-        
+    if (leadData.hasBudget === 'sim' && requestData.scheduledDate && requestData.scheduledTime) {
+      try {
+        const eventData = {
+          summary: `Sessão Estratégica - ${leadData.name}`,
+          description: `Sessão estratégica com ${leadData.name} (${leadData.email})
+          
 Dor principal: ${leadData.painPoint}
 WhatsApp: ${leadData.whatsapp}
 Página de origem: ${sourcePage}
+Tem orçamento: ${leadData.hasBudget}
 
 Sessão estratégica gratuita para análise do negócio de energia solar e criação de plano de crescimento.`,
-        startTime: new Date(scheduledDateTime).toISOString(),
-        endTime: new Date(new Date(scheduledDateTime).getTime() + 60 * 60 * 1000).toISOString(), // +1 hora
-        attendees: [leadData.email, 'matheusdrarity@gmail.com', 'caiorarity@gmail.com']
+          startTime: new Date(scheduledDateTime).toISOString(),
+          endTime: new Date(new Date(scheduledDateTime).getTime() + 60 * 60 * 1000).toISOString(), // +1 hora
+          attendees: [leadData.email, 'matheusdrarity@gmail.com', 'caiorarity@gmail.com']
+        }
+
+        const calendarResult = await createCalendarEvent(eventData)
+        eventId = calendarResult.eventId
+        meetLink = calendarResult.meetLink
+        
+        console.log('✅ Evento criado no Google Calendar:', eventId)
+        console.log('🔗 Link do Google Meet:', meetLink)
+        
+        // O Google Calendar enviará automaticamente os emails nativos para todos os participantes
+        console.log('📧 Emails nativos do Google Calendar serão enviados automaticamente')
+        
+      } catch (calendarError) {
+        console.error('❌ Erro ao criar evento no Google Calendar:', calendarError)
+        // Continue processing even if Calendar fails
       }
-
-      const calendarResult = await createCalendarEvent(eventData)
-      eventId = calendarResult.eventId
-      meetLink = calendarResult.meetLink
-      
-      console.log('✅ Evento criado no Google Calendar:', eventId)
-      console.log('🔗 Link do Google Meet:', meetLink)
-      
-      // O Google Calendar enviará automaticamente os emails nativos para todos os participantes
-      console.log('📧 Emails nativos do Google Calendar serão enviados automaticamente')
-      
-    } catch (calendarError) {
-      console.error('❌ Erro ao criar evento no Google Calendar:', calendarError)
-      // Continue processing even if Calendar fails
+    } else {
+      console.log('ℹ️ Lead sem orçamento - não criando evento no calendário')
     }
-
-    // O Google Calendar enviará automaticamente os emails nativos para todos os participantes
-    console.log('📧 Emails nativos do Google Calendar serão enviados automaticamente')
 
     // Simular processamento bem-sucedido
     await new Promise(resolve => setTimeout(resolve, 1000))

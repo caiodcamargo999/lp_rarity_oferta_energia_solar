@@ -1,31 +1,25 @@
 import { google } from 'googleapis'
 import * as path from 'path'
 
-// Configuração da conta de serviço - usar variáveis de ambiente em produção
+// Configuração da conta de serviço - usar variáveis de ambiente sempre
 const getServiceAccountConfig = () => {
-  // Em produção, usar variáveis de ambiente
-  if (process.env.NODE_ENV === 'production') {
-    if (!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !process.env.GOOGLE_PRIVATE_KEY) {
-      throw new Error('Variáveis de ambiente GOOGLE_SERVICE_ACCOUNT_EMAIL e GOOGLE_PRIVATE_KEY são obrigatórias em produção')
-    }
-    
-    return {
-      type: 'service_account',
-      project_id: process.env.GOOGLE_PROJECT_ID || 'lp-rarity-oferta-energia-solar',
-      private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID || '',
-      private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-      client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      client_id: process.env.GOOGLE_CLIENT_ID || '',
-      auth_uri: 'https://accounts.google.com/o/oauth2/auth',
-      token_uri: 'https://oauth2.googleapis.com/token',
-      auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
-      client_x509_cert_url: `https://www.googleapis.com/robot/v1/metadata/x509/${process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL}`
-    }
+  // Verificar se as variáveis de ambiente estão configuradas
+  if (!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !process.env.GOOGLE_PRIVATE_KEY) {
+    throw new Error('Variáveis de ambiente GOOGLE_SERVICE_ACCOUNT_EMAIL e GOOGLE_PRIVATE_KEY são obrigatórias')
   }
   
-  // Em desenvolvimento, usar arquivo físico
-  const serviceAccountPath = path.join(process.cwd(), 'lp-rarity-oferta-energia-solar-d04cccf3789c.json')
-  return serviceAccountPath
+  return {
+    type: 'service_account',
+    project_id: process.env.GOOGLE_PROJECT_ID || 'lp-rarity-oferta-energia-solar',
+    private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID || '',
+    private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    client_id: process.env.GOOGLE_CLIENT_ID || '',
+    auth_uri: 'https://accounts.google.com/o/oauth2/auth',
+    token_uri: 'https://oauth2.googleapis.com/token',
+    auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
+    client_x509_cert_url: `https://www.googleapis.com/robot/v1/metadata/x509/${process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL}`
+  }
 }
 
 // Função para obter cliente OAuth2 para Google Calendar
@@ -87,12 +81,21 @@ const auth = getAuth()
 const sheets = google.sheets({ version: 'v4', auth })
 // Calendar será criado dinamicamente com OAuth2
 
+// Log para debug
+console.log('🔧 Google Sheets Auth configurado:', {
+  hasAuth: !!auth,
+  serviceAccountEmail: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+  hasPrivateKey: !!process.env.GOOGLE_PRIVATE_KEY,
+  spreadsheetId: process.env.GOOGLE_SPREADSHEET_ID
+})
+
 export interface LeadData {
   sourcePage: string
   name: string
   whatsapp: string
   email: string
   painPoint: string
+  hasBudget: string
   scheduledDateTime: string
   timestamp: string
 }
@@ -123,13 +126,18 @@ export async function addLeadToSheet(leadData: LeadData): Promise<boolean> {
       leadData.whatsapp,            // D: WhatsApp
       leadData.email,               // E: Email
       leadData.painPoint,           // F: Maior Dor
-      leadData.scheduledDateTime    // G: Data e Hora da Reunião
+      leadData.hasBudget,           // G: Tem orçamento
+      leadData.scheduledDateTime    // H: Data e Hora da Reunião
     ]
+
+    console.log('📊 Dados que serão enviados para o Google Sheets:', rowData)
+    console.log('📊 Spreadsheet ID:', spreadsheetId)
+    console.log('📊 Range:', 'Leads!A:H')
 
     // Append the row to the sheet
     const response = await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: 'Leads!A:G', // Specify the range to append to (7 colunas)
+      range: 'Leads!A:H', // Specify the range to append to (8 colunas)
       valueInputOption: 'RAW',
       insertDataOption: 'INSERT_ROWS',
       requestBody: {
@@ -138,6 +146,7 @@ export async function addLeadToSheet(leadData: LeadData): Promise<boolean> {
     })
 
     console.log('✅ Lead adicionado ao Google Sheets:', response.data)
+    console.log('✅ Resposta completa:', response)
     return true
 
   } catch (error) {

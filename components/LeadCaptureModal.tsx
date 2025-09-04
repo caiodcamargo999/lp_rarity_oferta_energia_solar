@@ -13,6 +13,7 @@ interface FormData {
   whatsapp: string
   email: string
   painPoint: string
+  budget: string
 }
 
 interface TimeSlot {
@@ -83,6 +84,7 @@ const steps = [
   { id: 'whatsapp', title: 'Qual é o seu WhatsApp?', field: 'whatsapp' as keyof FormData },
   { id: 'email', title: 'Qual é o seu e-mail?', field: 'email' as keyof FormData },
   { id: 'pain', title: 'Qual sua maior dor para crescer seu negócio de energia solar?', field: 'painPoint' as keyof FormData },
+  { id: 'budget', title: 'Para dobrar suas vendas em até 90 dias, é necessário investir pelo menos R$25.000 nesse período para a estrutura e estratégias que tornam essa alavancagem possível. Você tem essa disponibilidade de orçamento?', field: 'budget' as keyof FormData },
   { id: 'schedule', title: 'Escolha um horário para sua sessão estratégica' },
 ]
 
@@ -93,7 +95,8 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
     name: '',
     whatsapp: '',
     email: '',
-    painPoint: ''
+    painPoint: '',
+    budget: ''
   })
   const [selectedDay, setSelectedDay] = useState<string>('')
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('')
@@ -175,6 +178,8 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
         return !emailRegex.test(value) ? 'E-mail deve ter um formato válido' : ''
       case 'painPoint':
         return value.trim().length < 10 ? 'Descreva melhor sua dor (mínimo 10 caracteres)' : ''
+      case 'budget':
+        return !value ? 'Por favor, selecione uma opção' : ''
       default:
         return ''
     }
@@ -191,7 +196,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
     }
   }
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const currentField = steps[currentStep].field
     if (currentField && currentField !== 'schedule' as any) {
       const error = validateField(currentField, formData[currentField])
@@ -199,6 +204,45 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
         setErrors(prev => ({ ...prev, [currentField]: error }))
         return
       }
+    }
+
+    // Lógica especial para a pergunta de orçamento
+    console.log('🔍 Debug - currentStep:', currentStep, 'budget:', formData.budget)
+    console.log('🔍 Debug - steps[currentStep]:', steps[currentStep])
+    
+    if (currentStep === 4 && formData.budget === 'Não, não possuo.') {
+      console.log('✅ Condição atendida - processando lead sem orçamento')
+      
+      // Redirecionar para WhatsApp IMEDIATAMENTE
+      const whatsappNumber = '5548991369301'
+      const message = encodeURIComponent('Olá Matheus, vim do formulário da página da Rarity. No momento não tenho o orçamento mínimo disponível, mas gostaria de saber se existe alguma alternativa ou próximo passo para mim.')
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`
+      
+      console.log('📱 Redirecionando para WhatsApp IMEDIATAMENTE:', whatsappUrl)
+      
+      // Redirecionar para WhatsApp IMEDIATAMENTE
+      window.location.href = whatsappUrl
+      
+      // Fechar modal
+      onClose()
+      
+      // Salvar dados no Google Sheets em background (fire and forget)
+      console.log('📊 Salvando dados no Google Sheets em background...')
+      handleSubmitWithoutSchedule()
+        .then(result => {
+          if (result) {
+            console.log('✅ Dados salvos com sucesso em background!')
+          } else {
+            console.log('⚠️ Falha ao salvar dados em background')
+          }
+        })
+        .catch(error => {
+          console.error('❌ Erro ao salvar dados em background:', error)
+        })
+      
+      return
+    } else {
+      console.log('❌ Condição não atendida - continuando fluxo normal')
     }
 
     if (currentStep < steps.length - 1) {
@@ -209,6 +253,48 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
   const handleBack = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1)
+    }
+  }
+
+  const handleSubmitWithoutSchedule = async (): Promise<boolean> => {
+    try {
+      const requestData = {
+        ...formData,
+        scheduledDate: null,
+        scheduledTime: null,
+        sourcePage: pathname || '/',
+        hasBudget: formData.budget === 'Sim, tenho.' ? 'sim' : 'não'
+      }
+      
+      console.log('📤 Enviando dados para API:', requestData)
+      console.log('📤 FormData original:', formData)
+      console.log('📤 Pathname:', pathname)
+      
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      })
+
+      const responseData = await response.json()
+      console.log('📥 Resposta da API:', responseData)
+      console.log('📊 Status da resposta:', response.status)
+      console.log('📊 Response OK:', response.ok)
+
+      if (response.ok) {
+        console.log('✅ Lead processado com sucesso!')
+        console.log('✅ Dados salvos no Google Sheets!')
+        return true
+      } else {
+        console.error('❌ Erro ao processar lead:', response.status, responseData)
+        return false
+      }
+    } catch (error) {
+      console.error('❌ Erro ao enviar formulário:', error)
+      console.error('❌ Stack trace:', error instanceof Error ? error.stack : 'N/A')
+      return false
     }
   }
 
@@ -232,6 +318,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
           scheduledDate: selectedDay,
           scheduledTime: selectedTimeSlot,
           sourcePage: pathname || '/', // Pass the current page path
+          hasBudget: formData.budget === 'Sim, tenho.' ? 'sim' : 'não'
         }),
       })
 
@@ -489,6 +576,59 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                   )}
 
                   {currentStep === 4 && (
+                    <div className="space-y-4">
+                      <div className="space-y-3">
+                        <button
+                          onClick={() => handleInputChange('budget', 'Sim, tenho.')}
+                          className={`w-full p-4 rounded-xl border transition-all text-left ${
+                            formData.budget === 'Sim, tenho.'
+                              ? 'border-primary-500 bg-primary-500/20 text-white shadow-lg'
+                              : 'border-gray-600/50 bg-gray-800/30 text-gray-300 hover:border-primary-500/50 hover:bg-primary-500/10 hover:shadow-md'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className={`w-4 h-4 rounded-full border-2 ${
+                              formData.budget === 'Sim, tenho.'
+                                ? 'border-primary-500 bg-primary-500'
+                                : 'border-gray-500'
+                            }`}>
+                              {formData.budget === 'Sim, tenho.' && (
+                                <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                              )}
+                            </div>
+                            <span className="font-medium">Sim, tenho.</span>
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={() => handleInputChange('budget', 'Não, não possuo.')}
+                          className={`w-full p-4 rounded-xl border transition-all text-left ${
+                            formData.budget === 'Não, não possuo.'
+                              ? 'border-primary-500 bg-primary-500/20 text-white shadow-lg'
+                              : 'border-gray-600/50 bg-gray-800/30 text-gray-300 hover:border-primary-500/50 hover:bg-primary-500/10 hover:shadow-md'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className={`w-4 h-4 rounded-full border-2 ${
+                              formData.budget === 'Não, não possuo.'
+                                ? 'border-primary-500 bg-primary-500'
+                                : 'border-gray-500'
+                            }`}>
+                              {formData.budget === 'Não, não possuo.' && (
+                                <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                              )}
+                            </div>
+                            <span className="font-medium">Não, não possuo.</span>
+                          </div>
+                        </button>
+                      </div>
+                      {errors.budget && (
+                        <p className="text-red-300/60 text-xs opacity-70">{errors.budget}</p>
+                      )}
+                    </div>
+                  )}
+
+                  {currentStep === 5 && (
                     <div className="space-y-6">
                       {/* Seleção de Dia */}
                       <div className="space-y-3">

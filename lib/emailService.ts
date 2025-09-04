@@ -87,7 +87,7 @@ export async function sendConfirmationEmail(emailData: EmailData): Promise<boole
               <li>Análise do seu negócio de energia solar</li>
               <li>Identificação das principais oportunidades</li>
               <li>Estratégia personalizada para crescimento</li>
-              <li>Plano de ação concreto para os próximos 60 dias</li>
+              <li>Plano de ação concreto para os próximos 90 dias</li>
             </ul>
             
             <div class="highlight">
@@ -95,7 +95,7 @@ export async function sendConfirmationEmail(emailData: EmailData): Promise<boole
               <p>Se precisar reagendar ou cancelar, entre em contato conosco pelo WhatsApp ou responda este email.</p>
             </div>
             
-            <p>Estamos ansiosos para ajudá-lo a <strong>dobrar suas vendas em 60 dias</strong>! 🚀</p>
+            <p>Estamos ansiosos para ajudá-lo a <strong>dobrar suas vendas em 90 dias</strong>! 🚀</p>
             
             <p>Atenciosamente,<br>
             <strong>Equipe Rarity Agency</strong></p>

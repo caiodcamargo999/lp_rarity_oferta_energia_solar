@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Rarity Agency - Crescimento e Vendas para Empresas de Energia Solar',
-  description: 'Dobramos suas vendas de placas solares em 60 dias. Estratégias comprovadas de marketing digital para empresas de energia solar no Brasil.',
+  description: 'Dobramos suas vendas de placas solares em 90 dias. Estratégias comprovadas de marketing digital para empresas de energia solar no Brasil.',
   keywords: 'marketing digital, energia solar, placas solares, vendas, crescimento, agência, Brasil',
   authors: [{ name: 'Rarity Agency' }],
   creator: 'Rarity Agency',
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Rarity Agency - Crescimento e Vendas para Empresas de Energia Solar',
-    description: 'Dobramos suas vendas de placas solares em 60 dias. Estratégias comprovadas de marketing digital.',
+    description: 'Dobramos suas vendas de placas solares em 90 dias. Estratégias comprovadas de marketing digital.',
     url: 'https://rarityagency.io',
     siteName: 'Rarity Agency',
     images: [
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Rarity Agency - Crescimento e Vendas para Empresas de Energia Solar',
-    description: 'Dobramos suas vendas de placas solares em 60 dias. Estratégias comprovadas de marketing digital.',
+    description: 'Dobramos suas vendas de placas solares em 90 dias. Estratégias comprovadas de marketing digital.',
     images: ['/rarity_logo.png'],
   },
   robots: {
