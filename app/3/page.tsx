@@ -44,9 +44,9 @@ export default function GoogleAdsPage() {
         <div className="max-w-4xl mx-auto">
           {/* ===== TÍTULO PRINCIPAL COM TIPOGRAFIA DESIGNERFLIX ===== */}
           <h1 className="text-h1 font-bold text-text-primary mb-6 leading-tight tracking-tight">
-            <span className="gradient-text">DOBRE</span> suas Vendas de Placas Solares<br/>
+            <span className="gradient-text">DOBRE</span> suas vendas de placas solares <span className="gradient-text">em 90 dias</span><br/>
             <span className="text-h3 font-semibold text-text-secondary mt-4 block">
-              com Google Ads + Landing Pages
+              com Google Ads e Landing Pages de Alta Conversão
             </span>
           </h1>
           
@@ -56,6 +56,28 @@ export default function GoogleAdsPage() {
             <br/><br/>
             Nós implementamos sistemas que <strong className="text-text-primary">capturam clientes que já estão procurando energia solar no Google</strong> e multiplicam seus resultados usando estratégias comprovadas de <span className="gradient-text">anúncios ultra-segmentados</span>, <span className="text-primary">landing pages otimizadas</span> e <span className="text-primary">conversão maximizada</span>.
           </p>
+
+          {/* Flechinha para baixo - ONDE A SETA VERMELHA ESTÁ APONTANDO */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="mt-4"
+          >
+            <svg
+              className="w-6 h-6 mx-auto text-text-primary animate-bounce"
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2}
+                d="M19 14l-7 7m0 0l-7-7m7 7V3"
+              />
+            </svg>
+          </motion.div>
         </div>
       </motion.section>
 
@@ -66,25 +88,47 @@ export default function GoogleAdsPage() {
         animate={{ opacity: 1 }}
         transition={{ duration: 1, ease: "easeOut" }}
       >
-        <div className="max-w-sm mx-auto">
-          {/* Retângulo do vídeo formato reels (9:16) */}
+        <div className="max-w-4xl mx-auto">
+          {/* Label do Vídeo */}
           <motion.div
-            className="relative aspect-[9/16] bg-gray-800 rounded-lg overflow-hidden cursor-pointer group"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="mb-6"
           >
-            {/* Fundo cinza do vídeo */}
-            <div className="absolute inset-0 bg-gray-800"></div>
-            
-            {/* Botão de play centralizado NO MEIO do retângulo */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <motion.button
-                className="w-24 h-24 bg-black/80 backdrop-blur-md rounded-full border border-white/20 flex items-center justify-center group-hover:scale-110 transition-all duration-300"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
+            <h2 className="text-lg font-semibold text-text-primary">
+              ASSISTA COMO FUNCIONA
+            </h2>
+          </motion.div>
+
+          {/* Vídeo - CORRIGIDO PARA MOBILE */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.4 }}
+            className="flex justify-center mb-4 md:mb-8"
+          >
+            <div className="w-full max-w-sm mx-auto">
+              {/* Retângulo do vídeo formato reels (9:16) - RESPONSIVO */}
+              <motion.div
+                className="relative w-full aspect-[9/16] bg-gray-800 rounded-lg overflow-hidden cursor-pointer group"
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.3 }}
               >
-                <Play className="w-12 h-12 text-white ml-1" />
-              </motion.button>
+                {/* Fundo cinza do vídeo */}
+                <div className="absolute inset-0 bg-gray-800"></div>
+                
+                {/* Botão de play centralizado NO MEIO do retângulo */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <motion.button
+                    className="w-24 h-24 bg-black/80 backdrop-blur-md rounded-full border border-white/20 flex items-center justify-center group-hover:scale-110 transition-all duration-300"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Play className="w-12 h-12 text-white ml-1" />
+                  </motion.button>
+                </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>
@@ -92,7 +136,7 @@ export default function GoogleAdsPage() {
 
       {/* Botão CTA da página abaixo do vídeo - IDÊNTICO ao da página principal */}
       <motion.div
-        className="mt-8 flex justify-center w-full px-4"
+        className="mt-4 md:mt-8 flex justify-center w-full px-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
