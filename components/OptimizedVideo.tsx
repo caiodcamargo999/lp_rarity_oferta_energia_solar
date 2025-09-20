@@ -62,7 +62,7 @@ export default function OptimizedVideo({
     })
     
     video.addEventListener('canplay', () => {
-      setIsVideoLoaded(true)
+      // Não definir como carregado ainda - manter thumbnail visível
     })
     
     video.addEventListener('canplaythrough', () => {
@@ -154,6 +154,8 @@ export default function OptimizedVideo({
       // Tentar reproduzir diretamente
       await video.play()
       
+      // Esconder thumbnail apenas quando vídeo começar a reproduzir
+      setIsVideoLoaded(true)
       setIsPlaying(true)
       setShowPlayButton(false)
       
@@ -179,6 +181,8 @@ export default function OptimizedVideo({
           video.volume = 1.0
         }, 1000)
         
+        // Esconder thumbnail quando vídeo reproduzir
+        setIsVideoLoaded(true)
         setIsPlaying(true)
         setShowPlayButton(false)
         onPlay?.()
@@ -197,6 +201,7 @@ export default function OptimizedVideo({
     video.pause()
     setIsPlaying(false)
     setIsBuffering(false) // Reset buffering state when pausing
+    setIsVideoLoaded(false) // Mostrar thumbnail novamente quando pausar
     setShowPlayButton(true)
     setShowPauseButton(false) // Esconder botão de pause ao pausar
     onPause?.()
@@ -249,9 +254,11 @@ export default function OptimizedVideo({
         className="w-full h-full object-cover rounded-xl"
         poster={poster}
         onTimeUpdate={handleTimeUpdate}
-        onLoadedData={() => setIsVideoLoaded(true)}
+        onLoadedData={() => {
+          // Vídeo carregado mas manter thumbnail
+        }}
         onCanPlay={() => {
-          setIsVideoLoaded(true)
+          // Vídeo pode reproduzir mas manter thumbnail
         }}
         onError={(e) => {
           console.error('❌ Erro no elemento vídeo:', e)
