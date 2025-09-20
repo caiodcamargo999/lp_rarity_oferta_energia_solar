@@ -7,7 +7,15 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "upload-video": "node scripts/upload-video-r2.js",
+    "upload-video-googleads": "node scripts/upload-video-r2.js video-google-ads.mp4 googleads",
+    "upload-video-landingpages": "node scripts/upload-video-r2.js video-landing-pages.mp4 landingpages",
+    "upload-large-video": "node scripts/upload-large-video-r2.js",
+    "upload-large-video-googleads": "node scripts/upload-large-video-r2.js video-google-ads.mp4 googleads",
+    "upload-large-video-landingpages": "node scripts/upload-large-video-r2.js video-landing-pages.mp4 landingpages",
+    "setup-r2": "echo 'Configure as variáveis de ambiente R2 conforme env-config-r2-videos.txt'",
+    "setup-aws-cli": "echo 'Instale AWS CLI: https://aws.amazon.com/cli/'"
   },
   "dependencies": {
     "@chakra-ui/next-js": "^2.2.0",

@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import LeadCaptureModal from './LeadCaptureModal'
 
 interface SuccessCasesProps {
-  version?: "1" | "2"
+  version?: "1" | "2" | "4"
   showUrgency?: boolean
   showCTA?: boolean
 }
@@ -38,8 +38,8 @@ export default function SuccessCases({ version = "1", showUrgency = false, showC
       // Versão 1: mostrar tudo desde o começo
       setLocalShowUrgency(true)
       setLocalShowCTA(true)
-    } else if (version === "2") {
-      // Versão 2: usar estados do VideoSection
+    } else if (version === "2" || version === "4") {
+      // Versão 2 e 4: usar estados do VideoSection
       setLocalShowUrgency(showUrgency)
       setLocalShowCTA(showCTA)
     }

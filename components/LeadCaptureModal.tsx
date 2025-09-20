@@ -118,6 +118,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
     }
   }, [isOpen])
 
+
   // Buscar horários disponíveis quando um dia for selecionado (sem fallback local)
   useEffect(() => {
     if (selectedDay) {
@@ -138,15 +139,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
   const fetchAvailableTimeSlots = async (date: string) => {
     setIsLoadingSlots(true)
     try {
-      // Timeout de 5 segundos para a requisição
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000)
-      
-      const response = await fetch(`/api/leads?date=${date}`, {
-        signal: controller.signal
-      })
-      
-      clearTimeout(timeoutId)
+      const response = await fetch(`/api/leads?date=${date}`)
       
       if (response.ok) {
         const data = await response.json()
@@ -156,7 +149,11 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
         setAvailableTimeSlots([])
       }
     } catch (error) {
-      console.error('Erro ao buscar horários disponíveis:', error)
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('Requisição cancelada por timeout')
+      } else {
+        console.error('Erro ao buscar horários disponíveis:', error)
+      }
       // Fallback: mostrar horários padrão se der timeout
       const defaultSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00']
       setAvailableTimeSlots(defaultSlots)

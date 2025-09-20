@@ -1,18 +1,23 @@
 'use client'
 
-import { Button } from '@/components/ui/Button'
-import { ArrowRight, Play, CheckCircle, Star, Zap } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useState } from 'react'
+import VideoSectionV3 from '../../components/VideoSectionV3'
 import SuccessCases from '../../components/SuccessCases'
 import LeadCaptureModal from '../../components/LeadCaptureModal'
-import VideoSectionV3 from '../../components/VideoSectionV3'
-import { useState } from 'react'
 
-export default function GoogleAdsPage() {
-  // Página /3 - Google Ads e Landing Pages (mesma estrutura da página principal)
+export default function HomePageV4() {
+  // Versão /4: Com delays de 4 minutos
+  const [showUrgency, setShowUrgency] = useState(false)
+  const [showCTA, setShowCTA] = useState(false)
   const [isLeadModalOpen, setIsLeadModalOpen] = useState(false)
+
+  const handleVideoTimeUpdate = (time: number) => {
+    // Versão 4: timing controlado pelo VideoSectionV4
+    console.log(`⏱️ Tempo do vídeo: ${Math.floor(time)}s`)
+  }
 
   return (
     <main className="min-h-screen w-full">
@@ -61,26 +66,28 @@ export default function GoogleAdsPage() {
         </div>
       </motion.section>
 
-      {/* Video Section - Usando componente otimizado para R2 */}
+      {/* Video Section - Usando componente otimizado para R2 com timing de 4 minutos */}
       <VideoSectionV3 
-        version="1"
+        version="4" 
         videoId="googleads"
+        onTimeUpdate={handleVideoTimeUpdate}
+        onUrgencyChange={setShowUrgency}
+        onCTAChange={setShowCTA}
         onOpenModal={() => setIsLeadModalOpen(true)}
       />
 
-
       {/* Success Cases Section */}
       <SuccessCases 
-        version="1" 
-        showUrgency={true}
-        showCTA={true}
+        version="4" 
+        showUrgency={showUrgency}
+        showCTA={showCTA}
       />
 
       {/* Footer */}
       <footer className="text-center py-8 border-t border-white/10">
         <div className="max-w-4xl mx-auto">
-          <p className="text-body text-text-secondary mb-4">
-            Transforme sua empresa de energia solar em uma máquina de vendas com Google Ads
+          <p className="text-text-secondary mb-4">
+            Transforme sua empresa de energia solar em uma máquina de vendas
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
             <a 
@@ -101,7 +108,7 @@ export default function GoogleAdsPage() {
               Follow @rarity.brasil
             </a>
           </div>
-          <p className="text-small text-text-secondary">
+          <p className="text-text-secondary text-sm">
             Rarity Agency © 2025 | Especialistas em Marketing Digital para Energia Solar
           </p>
         </div>

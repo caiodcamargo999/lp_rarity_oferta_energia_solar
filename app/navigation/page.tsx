@@ -57,6 +57,22 @@ export default function NavigationPage() {
               Seções aparecem após 1:00 e 1:20 de vídeo
             </p>
           </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.9 }}
+          >
+            <Link 
+              href="/4"
+              className="block bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-6 px-12 rounded-2xl text-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg"
+            >
+              Versão /4 - Com Delays de 4 Minutos
+            </Link>
+            <p className="text-text-secondary mt-3">
+              Seções aparecem após 4:00 e 4:20 de vídeo
+            </p>
+          </motion.div>
         </div>
         
         <motion.div 
