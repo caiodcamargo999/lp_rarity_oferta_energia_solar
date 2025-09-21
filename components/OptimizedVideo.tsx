@@ -12,6 +12,7 @@ interface OptimizedVideoProps {
   onPlay?: () => void
   onPause?: () => void
   className?: string
+  fallbackSources?: string[] // Fontes de fallback
 }
 
 export default function OptimizedVideo({
@@ -20,7 +21,8 @@ export default function OptimizedVideo({
   onTimeUpdate,
   onPlay,
   onPause,
-  className = ''
+  className = '',
+  fallbackSources = []
 }: OptimizedVideoProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -29,135 +31,202 @@ export default function OptimizedVideo({
   const [showPauseButton, setShowPauseButton] = useState(false)
   const [isBuffering, setIsBuffering] = useState(false)
   const [loadProgress, setLoadProgress] = useState(0)
+  const [currentSourceIndex, setCurrentSourceIndex] = useState(0)
+  const [hasTriedFallback, setHasTriedFallback] = useState(false)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const [currentTime, setCurrentTime] = useState(0)
+  
+  // ===== FONTES DE VÍDEO COM FALLBACKS =====
+  const allSources = [src, ...fallbackSources]
+  const currentSource = allSources[currentSourceIndex]
+
 
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
     
-    // Configurações básicas sem otimizações agressivas
-    video.preload = 'metadata' // Mudança: metadata em vez de auto
+    // ===== CONFIGURAÇÕES OTIMIZADAS PARA REPRODUÇÃO IMEDIATA =====
+    video.preload = 'auto' // Mudança: auto para pré-carregar o vídeo
     video.playsInline = true
     video.muted = true
     
-    // Não aplicar otimizações agressivas que podem causar travamento
-    // applyVideoOptimizations(video)
+    // ===== CONFIGURAÇÕES DE BUFFER OTIMIZADAS =====
+    // Configurar buffer para reprodução suave
+    // video.buffered é somente leitura, não pode ser atribuído
+    video.load()
     
-    // Não otimizar URL que pode causar problemas
-    // const optimizedSrc = optimizeVideoUrl(src)
-    // if (optimizedSrc !== src) {
-    //   video.src = optimizedSrc
-    // }
+    // ===== CONFIGURAÇÕES DE PERFORMANCE =====
+    // Otimizar para reprodução imediata
+    video.setAttribute('playsinline', 'true')
+    video.setAttribute('webkit-playsinline', 'true')
+    video.setAttribute('x5-playsinline', 'true')
     
-    // Configurações básicas sem monitoramento complexo
+    // Configurar para melhor performance
+    video.setAttribute('data-setup', '{}')
+    video.setAttribute('data-keep-alive', 'true')
     
-    // Não carregar automaticamente - deixar para o usuário
-    // video.load()
+    // ===== EVENT LISTENERS OTIMIZADOS =====
+    const handleLoadStart = () => {
+      console.log('🎬 Iniciando carregamento do vídeo...')
+      setIsLoading(true)
+    }
     
-    // Configurações de buffer para reprodução suave
-    video.addEventListener('loadstart', () => {
-      // Iniciando carregamento do vídeo
-    })
+    const handleCanPlay = () => {
+      console.log('✅ Vídeo pode reproduzir - buffer suficiente')
+      setIsVideoLoaded(true)
+      setIsLoading(false)
+    }
     
-    video.addEventListener('canplay', () => {
-      // Não definir como carregado ainda - manter thumbnail visível
-    })
+    const handleCanPlayThrough = () => {
+      console.log('🚀 Vídeo totalmente carregado - reprodução garantida')
+      setIsVideoLoaded(true)
+      setIsLoading(false)
+    }
     
-    video.addEventListener('canplaythrough', () => {
-      // Vídeo carregado completamente
-    })
-    
-    video.addEventListener('waiting', () => {
+    const handleWaiting = () => {
+      console.log('⏳ Aguardando buffer...')
       setIsBuffering(true)
-    })
+    }
     
-    video.addEventListener('playing', () => {
+    const handlePlaying = () => {
+      console.log('▶️ Vídeo reproduzindo')
       setIsBuffering(false)
-    })
+    }
     
-    video.addEventListener('stalled', () => {
+    const handleStalled = () => {
+      console.log('⚠️ Vídeo travado - tentando recuperar...')
       setIsBuffering(true)
-    })
+    }
     
-    video.addEventListener('progress', () => {
+    const handleProgress = () => {
       if (video.buffered.length > 0) {
         const bufferedEnd = video.buffered.end(video.buffered.length - 1)
         const duration = video.duration
         if (duration > 0) {
           const progress = (bufferedEnd / duration) * 100
           setLoadProgress(progress)
+          console.log(`📊 Buffer: ${progress.toFixed(1)}%`)
         }
       }
-    })
+    }
     
-    video.addEventListener('loadeddata', () => {
+    const handleLoadedData = () => {
+      console.log('📦 Dados do vídeo carregados')
       setIsVideoLoaded(true)
-    })
+    }
     
-    video.addEventListener('error', (e) => {
+    const handleError = (e: Event) => {
       console.error('❌ Erro no vídeo:', e)
-    })
+      setIsLoading(false)
+      setIsBuffering(false)
+      
+      // ===== TENTAR FALLBACK SE DISPONÍVEL =====
+      if (currentSourceIndex < allSources.length - 1 && !hasTriedFallback) {
+        console.log(`🔄 Tentando fallback ${currentSourceIndex + 1}/${allSources.length - 1}`)
+        setCurrentSourceIndex(prev => prev + 1)
+        setHasTriedFallback(true)
+        
+        // Recarregar vídeo com nova fonte
+        setTimeout(() => {
+          if (video) {
+            video.load()
+          }
+        }, 1000)
+      } else {
+        console.error('❌ Todos os fallbacks falharam')
+      }
+    }
     
+    // ===== INTERSECTION OBSERVER OTIMIZADO =====
     const handleIntersection = (entries: IntersectionObserverEntry[]) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting && !isVideoLoaded) {
-          // Carregar apenas quando necessário e sem forçar
+        if (entry.isIntersecting) {
+          console.log('👁️ Vídeo visível - iniciando pré-carregamento')
+          // Forçar carregamento quando visível
           if (video.readyState === 0) {
             video.load()
           }
-          setIsVideoLoaded(true)
         }
       })
     }
     
+    // ===== ADICIONAR EVENT LISTENERS =====
+    video.addEventListener('loadstart', handleLoadStart)
+    video.addEventListener('canplay', handleCanPlay)
+    video.addEventListener('canplaythrough', handleCanPlayThrough)
+    video.addEventListener('waiting', handleWaiting)
+    video.addEventListener('playing', handlePlaying)
+    video.addEventListener('stalled', handleStalled)
+    video.addEventListener('progress', handleProgress)
+    video.addEventListener('loadeddata', handleLoadedData)
+    video.addEventListener('error', handleError)
+    
+    // ===== OBSERVER COM CONFIGURAÇÕES OTIMIZADAS =====
     const observer = new IntersectionObserver(handleIntersection, {
-      threshold: 0.5, // Mudança: 0.5 em vez de 0.1 para carregar mais tarde
-      rootMargin: '50px' // Mudança: 50px em vez de 100px
+      threshold: 0.1, // Carregar quando 10% visível
+      rootMargin: '100px' // Carregar 100px antes de ficar visível
     })
     observer.observe(video)
     
     return () => {
       observer.disconnect()
       // Limpar event listeners
-      video.removeEventListener('loadstart', () => {})
-      video.removeEventListener('canplay', () => {})
-      video.removeEventListener('canplaythrough', () => {})
-      video.removeEventListener('waiting', () => {})
-      video.removeEventListener('playing', () => {})
-      video.removeEventListener('stalled', () => {})
-      video.removeEventListener('error', () => {})
-      video.removeEventListener('progress', () => {})
-      video.removeEventListener('loadeddata', () => {})
+      video.removeEventListener('loadstart', handleLoadStart)
+      video.removeEventListener('canplay', handleCanPlay)
+      video.removeEventListener('canplaythrough', handleCanPlayThrough)
+      video.removeEventListener('waiting', handleWaiting)
+      video.removeEventListener('playing', handlePlaying)
+      video.removeEventListener('stalled', handleStalled)
+      video.removeEventListener('progress', handleProgress)
+      video.removeEventListener('loadeddata', handleLoadedData)
+      video.removeEventListener('error', handleError)
     }
-  }, [isVideoLoaded])
+  }, [])
 
   const handlePlay = async () => {
     const video = videoRef.current
     if (!video) return
     
     try {
+      console.log('🎬 Iniciando reprodução do vídeo...')
       setIsLoading(true)
       
-      // Configurações simples
+      // ===== CONFIGURAÇÕES OTIMIZADAS =====
       video.muted = false
       video.volume = 1.0
       
-      // Carregar vídeo apenas quando necessário
-      if (video.readyState === 0) {
+      // ===== VERIFICAR ESTADO DO VÍDEO =====
+      console.log('📊 Estado do vídeo:', {
+        readyState: video.readyState,
+        networkState: video.networkState,
+        buffered: video.buffered.length > 0 ? `${video.buffered.end(0).toFixed(1)}s` : '0s',
+        duration: video.duration ? `${video.duration.toFixed(1)}s` : 'desconhecida'
+      })
+      
+      // ===== ESTRATÉGIA DE REPRODUÇÃO INTELIGENTE =====
+      if (video.readyState >= 3) { // HAVE_FUTURE_DATA ou HAVE_ENOUGH_DATA
+        console.log('✅ Vídeo pronto - reproduzindo imediatamente')
+        await video.play()
+      } else if (video.readyState >= 2) { // HAVE_CURRENT_DATA
+        console.log('⏳ Vídeo parcialmente carregado - aguardando buffer...')
+        // Aguardar um pouco para mais dados carregarem
+        await new Promise(resolve => setTimeout(resolve, 200))
+        await video.play()
+      } else {
+        console.log('🔄 Vídeo não carregado - forçando carregamento...')
         video.load()
-        // Aguardar um pouco para o vídeo carregar
-        await new Promise(resolve => setTimeout(resolve, 500))
+        // Aguardar carregamento
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        await video.play()
       }
       
-      // Tentar reproduzir diretamente
-      await video.play()
-      
-      // Esconder thumbnail apenas quando vídeo começar a reproduzir
+      // ===== SUCESSO - ATUALIZAR ESTADOS =====
+      console.log('🚀 Vídeo reproduzindo com sucesso!')
       setIsVideoLoaded(true)
       setIsPlaying(true)
       setShowPlayButton(false)
+      setIsLoading(false)
       
       // Mostrar botão de pause por 2 segundos
       setShowPauseButton(true)
@@ -170,28 +239,50 @@ export default function OptimizedVideo({
     } catch (error) {
       console.error('❌ Erro ao reproduzir vídeo:', error)
       
-      // Estratégia simples de fallback
+      // ===== ESTRATÉGIA DE FALLBACK INTELIGENTE =====
       try {
+        console.log('🔄 Tentando fallback com muted...')
         video.muted = true
         await video.play()
         
-        // Ativar áudio depois
+        console.log('✅ Fallback com muted funcionou - ativando áudio...')
+        // Ativar áudio gradualmente
         setTimeout(() => {
           video.muted = false
           video.volume = 1.0
-        }, 1000)
+          console.log('🔊 Áudio ativado')
+        }, 500)
         
-        // Esconder thumbnail quando vídeo reproduzir
+        // Atualizar estados
         setIsVideoLoaded(true)
         setIsPlaying(true)
         setShowPlayButton(false)
+        setIsLoading(false)
         onPlay?.()
         
       } catch (retryError) {
         console.error('❌ Erro na segunda tentativa:', retryError)
+        setIsLoading(false)
+        
+        // ===== ÚLTIMA TENTATIVA - FORÇAR CARREGAMENTO =====
+        try {
+          console.log('🔄 Última tentativa - recarregando vídeo...')
+          video.load()
+          await new Promise(resolve => setTimeout(resolve, 2000))
+          video.muted = true
+          await video.play()
+          
+          setIsVideoLoaded(true)
+          setIsPlaying(true)
+          setShowPlayButton(false)
+          setIsLoading(false)
+          onPlay?.()
+          
+        } catch (finalError) {
+          console.error('❌ Falha total na reprodução:', finalError)
+          setIsLoading(false)
+        }
       }
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -201,8 +292,8 @@ export default function OptimizedVideo({
     video.pause()
     setIsPlaying(false)
     setIsBuffering(false) // Reset buffering state when pausing
-    setIsVideoLoaded(false) // Mostrar thumbnail novamente quando pausar
-    setShowPlayButton(true)
+    // NÃO definir setIsVideoLoaded(false) - manter vídeo carregado
+    setShowPlayButton(true) // Mostrar botão de play
     setShowPauseButton(false) // Esconder botão de pause ao pausar
     onPause?.()
   }
@@ -265,9 +356,17 @@ export default function OptimizedVideo({
         }}
         playsInline
         muted
-        preload="metadata"
+        preload="auto"
       >
-        <source src={src} type="video/mp4" />
+        <source src={currentSource} type="video/mp4" />
+        {allSources.map((source, index) => (
+          <source 
+            key={index} 
+            src={source} 
+            type="video/mp4" 
+            data-index={index}
+          />
+        ))}
         Seu navegador não suporta vídeos.
       </video>
       <div
@@ -292,7 +391,7 @@ export default function OptimizedVideo({
           )}
         </AnimatePresence>
 
-        {/* Indicador de Carregamento */}
+        {/* Indicador de Carregamento com Progresso */}
         <AnimatePresence>
           {isLoading && (
             <motion.div
@@ -302,7 +401,17 @@ export default function OptimizedVideo({
               className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm rounded-xl"
             >
               <div className="text-center">
-                <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto"></div>
+                <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+                <div className="text-white text-sm font-medium mb-2">Carregando vídeo...</div>
+                <div className="w-32 h-1 bg-white/20 rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-primary-500 to-secondary-500"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${loadProgress}%` }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </div>
+                <div className="text-white/70 text-xs mt-1">{loadProgress.toFixed(0)}%</div>
               </div>
             </motion.div>
           )}

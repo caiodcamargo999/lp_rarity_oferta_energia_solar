@@ -52,17 +52,25 @@ export default function VideoSectionV3({
     return videoConfigs[videoId as keyof typeof videoConfigs] || videoConfigs.default
   }
 
-  // ===== DETERMINAR MELHOR FONTE DE VÍDEO =====
+  // ===== DETERMINAR MELHOR FONTE DE VÍDEO COM FALLBACKS =====
   const getBestVideoSource = () => {
     const config = getVideoConfig()
     
-    // Usar URL pública do R2 (mais confiável)
+    // Prioridade: R2 > Proxy > Local
     if (config.r2 && !config.r2.includes('seu-bucket.r2.cloudflarestorage.com')) {
       console.log(`🎬 [${videoId}] Usando URL pública do R2:`, config.r2)
       return config.r2
     }
-    console.log(`🎬 [${videoId}] Usando API Proxy como fallback`)
-    return config.proxy
+    
+    // Fallback para API Proxy
+    if (config.proxy) {
+      console.log(`🎬 [${videoId}] Usando API Proxy como fallback`)
+      return config.proxy
+    }
+    
+    // Último fallback para local
+    console.log(`🎬 [${videoId}] Usando vídeo local como último recurso`)
+    return config.local
   }
 
   const getBestThumbnail = () => {
@@ -175,6 +183,10 @@ export default function VideoSectionV3({
               onPlay={handleVideoPlay}
               onPause={handleVideoPause}
               className="w-full h-full"
+              fallbackSources={[
+                getVideoConfig().proxy,
+                getVideoConfig().local
+              ].filter(Boolean)}
             />
           </div>
         </motion.div>
