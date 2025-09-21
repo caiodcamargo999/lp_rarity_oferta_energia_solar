@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { addLeadToSheet, LeadData, createCalendarEvent, getAvailableTimeSlots } from '@/lib/googleSheets'
+import { processLeadInGHL } from '@/lib/goHighLevel'
 
 interface RequestData {
   name: string
@@ -91,11 +92,47 @@ export async function POST(request: NextRequest) {
     console.log('💰 Tem orçamento:', leadData.hasBudget)
     console.log('📅 Data/Hora agendada:', scheduledDateTime)
 
-    // 1. Add lead to Google Sheets
+    // Array para armazenar resultados das integrações
+    const integrationResults = {
+      sheets: false,
+      ghl: false,
+      calendar: false,
+      email: false
+    }
+
+    // 1. NOVA INTEGRAÇÃO: Adicionar lead ao Go High Level
+    try {
+      console.log('🔗 Adicionando lead ao Go High Level...')
+      const ghlResult = await processLeadInGHL({
+        name: leadData.name,
+        email: leadData.email,
+        whatsapp: leadData.whatsapp,
+        painPoint: leadData.painPoint,
+        hasBudget: leadData.hasBudget,
+        sourcePage: leadData.sourcePage,
+        scheduledDateTime: leadData.scheduledDateTime
+      })
+      
+      if (ghlResult.success) {
+        console.log('✅ Lead adicionado ao Go High Level com sucesso!')
+        console.log('📞 Contato ID:', ghlResult.contact?.id)
+        console.log('💼 Oportunidade ID:', ghlResult.opportunity?.id)
+        integrationResults.ghl = true
+      } else {
+        console.error('❌ Erro ao adicionar lead ao Go High Level:', ghlResult.message)
+        // Continuar com outras integrações mesmo se GHL falhar
+      }
+    } catch (ghlError) {
+      console.error('❌ Erro crítico na integração GHL:', ghlError)
+      // Continuar com outras integrações
+    }
+
+    // 2. Add lead to Google Sheets (mantém a integração existente)
     try {
       console.log('📊 Tentando salvar no Google Sheets:', leadData)
       const sheetsResult = await addLeadToSheet(leadData)
       console.log('✅ Lead salvo no Google Sheets com sucesso:', sheetsResult)
+      integrationResults.sheets = true
     } catch (sheetsError) {
       console.error('❌ Erro ao salvar no Google Sheets:', sheetsError)
       if (sheetsError instanceof Error) {
@@ -104,7 +141,7 @@ export async function POST(request: NextRequest) {
       // Continue processing even if Sheets fails
     }
 
-    // 2. Create Google Calendar event (only if has budget)
+    // 3. Create Google Calendar event (only if has budget)
     let eventId = ''
     let meetLink = ''
     
@@ -134,6 +171,7 @@ Sessão estratégica gratuita para análise do negócio de energia solar e cria�
         
         // O Google Calendar enviará automaticamente os emails nativos para todos os participantes
         console.log('📧 Emails nativos do Google Calendar serão enviados automaticamente')
+        integrationResults.calendar = true
         
       } catch (calendarError) {
         console.error('❌ Erro ao criar evento no Google Calendar:', calendarError)
@@ -143,15 +181,23 @@ Sessão estratégica gratuita para análise do negócio de energia solar e cria�
       console.log('ℹ️ Lead sem orçamento - não criando evento no calendário')
     }
 
-    // Simular processamento bem-sucedido
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    // Response final com status de todas as integrações
+    console.log('🎉 Processamento concluído!')
+    console.log('📊 Resultados das integrações:', integrationResults)
 
     return NextResponse.json({
       success: true,
-      message: 'Lead capturado com sucesso! Sessão será agendada em breve.',
-      leadId: `lead-${Date.now()}`,
-      scheduledDateTime,
-      sourcePage,
+      message: 'Lead processado com sucesso',
+      leadData: {
+        name: leadData.name,
+        email: leadData.email,
+        scheduledDateTime: leadData.scheduledDateTime,
+        hasBudget: leadData.hasBudget
+      },
+      integrations: integrationResults,
+      redirectUrl: leadData.hasBudget === 'não' ? 
+        `https://wa.me/5548991369301?text=${encodeURIComponent('Olá Matheus, vim do formulário da página da Rarity. No momento não tenho o orçamento mínimo disponível, mas gostaria de saber se existe alguma alternativa ou próximo passo para mim.')}` 
+        : null,
       eventId,
       meetLink
     })

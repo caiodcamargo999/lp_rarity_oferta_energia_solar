@@ -189,6 +189,56 @@ export function clearTimeSlotsCache() {
   console.log('🧹 Cache de horários limpo')
 }
 
+// Função para atualizar horários em background (não bloqueia a resposta)
+async function updateTimeSlotsFromCalendar(date: string, baseSlots: string[]) {
+  try {
+    const oauth2Client = await getOAuth2Client()
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client })
+    
+    const startOfDay = new Date(`${date}T00:00:00-03:00`)
+    const endOfDay = new Date(`${date}T23:59:59-03:00`)
+    
+    const response = await calendar.events.list({
+      calendarId: 'matheusdrarity@gmail.com',
+      timeMin: startOfDay.toISOString(),
+      timeMax: endOfDay.toISOString(),
+      singleEvents: true,
+      orderBy: 'startTime',
+      maxResults: 5 // Apenas 5 eventos para máxima velocidade
+    })
+    
+    const events = response.data.items || []
+    let busySlots: string[] = []
+    
+    events.forEach(event => {
+      if (event.start?.dateTime) {
+        const eventStart = new Date(event.start.dateTime)
+        const eventEnd = new Date(event.end?.dateTime || eventStart.getTime() + 60 * 60 * 1000)
+        
+        const startHour = eventStart.getHours()
+        const endHour = eventEnd.getHours()
+        
+        for (let hour = startHour; hour < endHour; hour++) {
+          const slotTime = `${hour.toString().padStart(2, '0')}:00`
+          if (baseSlots.includes(slotTime)) {
+            busySlots.push(slotTime)
+          }
+        }
+      }
+    })
+    
+    busySlots = Array.from(new Set(busySlots))
+    const availableSlots = baseSlots.filter(slot => !busySlots.includes(slot))
+    
+    // Atualizar cache com dados reais do Calendar
+    timeSlotsCache.set(date, { slots: availableSlots, timestamp: Date.now() })
+    console.log(`🔄 Background update para ${date}:`, availableSlots)
+    
+  } catch (error) {
+    console.log('⚠️ Background calendar update failed:', error instanceof Error ? error.message : 'Unknown error')
+  }
+}
+
 export async function getAvailableTimeSlots(date: string): Promise<string[]> {
   try {
     // Verificar cache primeiro (cache mais agressivo para performance)
@@ -198,133 +248,47 @@ export async function getAvailableTimeSlots(date: string): Promise<string[]> {
       return cached.slots
     }
 
-    // Fallback rápido para datas futuras (não hoje)
+    // SOLUÇÃO ULTRA RÁPIDA: Retornar horários padrão IMEDIATAMENTE para todas as datas
+    // O Google Calendar será consultado em background apenas para o dia atual
     const now = new Date()
     const brasiliaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}))
     const today = brasiliaTime.toISOString().split('T')[0]
     const isToday = date === today
     
+    // Para datas futuras, retornar horários padrão IMEDIATAMENTE
     if (!isToday) {
-      // Para datas futuras, retornar horários padrão imediatamente
       const baseSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00']
       timeSlotsCache.set(date, { slots: baseSlots, timestamp: Date.now() })
+      console.log(`⚡ Retorno instantâneo para data futura ${date}:`, baseSlots)
       return baseSlots
     }
 
-
-    
-
-    
-    // Se for hoje e já passou das 17h, não mostrar horários
-    if (isToday) {
-      const currentHour = brasiliaTime.getHours()
-      const currentMinute = brasiliaTime.getMinutes()
-      
-      if (currentHour >= 17) {
-        timeSlotsCache.set(date, { slots: [], timestamp: Date.now() })
-        return []
-      }
-    }
-    
-    // Definir horários base (9h às 17h)
+    // Para hoje, retornar horários padrão IMEDIATAMENTE e consultar Calendar em background
     const baseSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00']
     
-    // Buscar eventos existentes no Google Calendar para a data solicitada (com timeout)
-    let busySlots: string[] = []
-    try {
-      // Timeout de 3 segundos para a consulta do Calendar
-      const calendarPromise = (async () => {
-        const oauth2Client = await getOAuth2Client()
-        const calendar = google.calendar({ version: 'v3', auth: oauth2Client })
-        
-        // Criar range de tempo para o dia solicitado
-        const startOfDay = new Date(`${date}T00:00:00-03:00`) // Início do dia em Brasília
-        const endOfDay = new Date(`${date}T23:59:59-03:00`)   // Fim do dia em Brasília
-        
-        // Buscar eventos no calendário do matheusdrarity@gmail.com (otimizado)
-        const response = await calendar.events.list({
-          calendarId: 'matheusdrarity@gmail.com',
-          timeMin: startOfDay.toISOString(),
-          timeMax: endOfDay.toISOString(),
-          singleEvents: true,
-          orderBy: 'startTime',
-          maxResults: 20 // Reduzido para 20 eventos para performance
-        })
-        
-        return response.data.items || []
-      })()
-      
-      // Timeout de 3 segundos
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout')), 3000)
-      )
-      
-      const events = await Promise.race([calendarPromise, timeoutPromise]) as any[]
-      
-      // Extrair horários ocupados
-      events.forEach(event => {
-        if (event.start?.dateTime) {
-          const eventStart = new Date(event.start.dateTime)
-          const eventEnd = new Date(event.end?.dateTime || eventStart.getTime() + 60 * 60 * 1000) // +1h se não tiver end
-          
-          // Converter para horário de Brasília e extrair hora
-          const startHour = eventStart.getHours()
-          const endHour = eventEnd.getHours()
-          
-          // Marcar todos os slots ocupados
-          for (let hour = startHour; hour < endHour; hour++) {
-            const slotTime = `${hour.toString().padStart(2, '0')}:00`
-            if (baseSlots.includes(slotTime)) {
-              busySlots.push(slotTime)
-            }
-          }
-          
-
-        }
-      })
-      
-      // Remover duplicatas
-      busySlots = Array.from(new Set(busySlots))
-      
-    } catch (calendarError) {
-      console.error('❌ Erro ao buscar eventos no calendário:', calendarError)
-      // Se falhar, usar lógica de fallback
-    }
-    
-    // Filtrar horários disponíveis
-    let availableSlots = baseSlots.filter(slot => !busySlots.includes(slot))
-    
-    // Se for hoje, filtrar horários que já passaram com buffer de 2 horas
-    if (isToday) {
-      // Usar horário correto de Brasília - método mais confiável
-      const now = new Date()
-      const brasiliaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}))
+    // Filtrar horários passados para hoje
       const currentHour = brasiliaTime.getHours()
       const currentMinute = brasiliaTime.getMinutes()
-      
-      // Buffer de 2 horas para garantir que o lead tenha tempo de se preparar
       const bufferHours = 2
       const cutoffHour = currentHour + bufferHours
       
-      console.log(`🕐 Horário atual em Brasília: ${currentHour}:${currentMinute.toString().padStart(2, '0')}`)
-      console.log(`⏰ Cutoff hour (com buffer de ${bufferHours}h): ${cutoffHour}`)
-      console.log(`📋 Horários antes do filtro: ${availableSlots.join(', ')}`)
-      
-      availableSlots = availableSlots.filter(slot => {
+    let availableSlots = baseSlots.filter(slot => {
         const slotHour = parseInt(slot.split(':')[0])
-        const isAvailable = slotHour > cutoffHour
-        console.log(`📅 Slot ${slot} (hora ${slotHour}): ${isAvailable ? '✅ Disponível' : '❌ Passou (cutoff: ${cutoffHour})'}`)
-        return isAvailable
+      return slotHour > cutoffHour
       })
-      
-      console.log(`📋 Horários após filtro: ${availableSlots.join(', ')}`)
-    }
-    // Para datas futuras, não filtrar por horário atual - mostrar todos os horários disponíveis
     
-
-    
-    // Salvar no cache com duração menor para horários dinâmicos (2 minutos)
+    // Salvar no cache e retornar IMEDIATAMENTE
     timeSlotsCache.set(date, { slots: availableSlots, timestamp: Date.now() })
+    console.log(`⚡ Retorno instantâneo para hoje ${date}:`, availableSlots)
+    
+    // Consultar Calendar em background (não bloquear a resposta)
+    setImmediate(async () => {
+      try {
+        await updateTimeSlotsFromCalendar(date, baseSlots)
+      } catch (error) {
+        console.log('⚠️ Background calendar check failed, using cached slots')
+      }
+    })
     
     return availableSlots
     
