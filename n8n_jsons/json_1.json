@@ -1,5 +1,5 @@
 {
-  "name": "Rarity Cold Call Agent",
+  "name": "Rarity Cold Call with Cloudflare R2",
   "nodes": [
     {
       "parameters": {
@@ -36,6 +36,10 @@
           {
             "name": "firstName",
             "value": "={{$json.contact.firstName}}"
+          },
+          {
+            "name": "fileName",
+            "value": "={{'audio_call_' + $json.contact.id + '.mp3'}}"
           }
         ]
       },
@@ -83,6 +87,29 @@
     },
     {
       "parameters": {
+        "operation": "upload",
+        "binaryDataPropertyName": "data",
+        "bucketName": "your-r2-bucket",
+        "fileName": "={{$json.fileName}}",
+        "fileData": "={{$node[\"ElevenLabs TTS\"].binary.data}}",
+        "contentType": "audio/mpeg"
+      },
+      "name": "Cloudflare R2 Upload",
+      "type": "n8n-nodes-aws-s3.s3",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        300
+      ],
+      "credentials": {
+        "awsS3": {
+          "id": "r2_credentials",
+          "name": "Cloudflare R2 Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
         "url": "https://rest.gohighlevel.com/v1/phone/call",
         "method": "POST",
         "options": {
@@ -97,7 +124,7 @@
             }
           ]
         },
-        "jsonBody": "={\n\"fromNumber\": \"={{$json.fromNumber}}\",\n\"toNumber\": \"={{$json.toNumber}}\",\n\"playAudioUrl\": \"{{$json.S3_AUDIO_URL}}\"\n}"
+        "jsonBody": "={\n\"fromNumber\": \"={{$json.fromNumber}}\",\n\"toNumber\": \"={{$json.toNumber}}\",\n\"playAudioUrl\": \"={{'https://public.r2.dev/your-r2-bucket/' + $json.fileName}}\"\n}"
       },
       "name": "Start GHL Call",
       "type": "n8n-nodes-base.httpRequest",
@@ -124,6 +151,13 @@
       }
     ],
     "ElevenLabs TTS": [
+      {
+        "node": "Cloudflare R2 Upload",
+        "type": "main",
+        "index": 0
+      }
+    ],
+    "Cloudflare R2 Upload": [
       {
         "node": "Start GHL Call",
         "type": "main",
