@@ -1,11 +1,11 @@
 {
-  "name": "Rarity Cold Call with Cloudflare R2",
+  "name": "Rarity Conversational Agent com Bland AI",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
         "authentication": "basicAuth",
-        "path": "lead-trigger",
+        "path": "webhook-ligacao-rarity",
         "options": {}
       },
       "name": "GHL Lead Trigger",
@@ -26,20 +26,12 @@
       "parameters": {
         "values": [
           {
-            "name": "fromNumber",
-            "value": "={{$json.number_from_ghl}}"
-          },
-          {
             "name": "toNumber",
             "value": "={{$json.contact.phone}}"
           },
           {
-            "name": "firstName",
-            "value": "={{$json.contact.firstName}}"
-          },
-          {
-            "name": "fileName",
-            "value": "={{'audio_call_' + $json.contact.id + '.mp3'}}"
+            "name": "fromNumber",
+            "value": "Seu número GHL aqui"
           }
         ]
       },
@@ -53,70 +45,13 @@
     },
     {
       "parameters": {
-        "url": "https://api.elevenlabs.io/v1/text-to-speech/YOUR_VOICE_ID",
-        "method": "POST",
-        "options": {
-          "responseFormat": "binary",
-          "headerParameters": [
-            {
-              "name": "xi-api-key",
-              "value": "={{$json.ELEVENLABS_API_KEY}}"
-            },
-            {
-              "name": "Accept",
-              "value": "audio/mpeg"
-            }
-          ]
-        },
-        "bodyParameters": {
-          "text": "Olá {{$json.firstName}}, aqui é o agente de voz da Rarity Agency. Estou ligando para...",
-          "model_id": "eleven_multilingual_v2",
-          "voice_settings": {
-            "stability": 0.5,
-            "similarity_boost": 0.75
-          }
-        }
-      },
-      "name": "ElevenLabs TTS",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 1,
-      "position": [
-        750,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "operation": "upload",
-        "binaryDataPropertyName": "data",
-        "bucketName": "your-r2-bucket",
-        "fileName": "={{$json.fileName}}",
-        "fileData": "={{$node[\"ElevenLabs TTS\"].binary.data}}",
-        "contentType": "audio/mpeg"
-      },
-      "name": "Cloudflare R2 Upload",
-      "type": "n8n-nodes-aws-s3.s3",
-      "typeVersion": 1,
-      "position": [
-        1000,
-        300
-      ],
-      "credentials": {
-        "awsS3": {
-          "id": "r2_credentials",
-          "name": "Cloudflare R2 Credentials"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "url": "https://rest.gohighlevel.com/v1/phone/call",
+        "url": "https://api.bland.ai/v1/calls",
         "method": "POST",
         "options": {
           "headerParameters": [
             {
               "name": "Authorization",
-              "value": "Bearer {{$json.GHL_API_KEY}}"
+              "value": "Bearer org_a619464a6a9421c3a90c23cfa2e770f0bb3894a5713499b5f5808751aff64a69f09abb6ddad8d5df3dac69"
             },
             {
               "name": "Content-Type",
@@ -124,13 +59,13 @@
             }
           ]
         },
-        "jsonBody": "={\n\"fromNumber\": \"={{$json.fromNumber}}\",\n\"toNumber\": \"={{$json.toNumber}}\",\n\"playAudioUrl\": \"={{'https://public.r2.dev/your-r2-bucket/' + $json.fileName}}\"\n}"
+        "jsonBody": "={\n\"phoneNumber\": \"={{$json.toNumber}}\",\n\"from\": \"={{$json.fromNumber}}\",\n\"agent_id\": \"agent_1801k5rhqnm0eybt1qh0fx5jfr59\",\n\"first_sentence\": \"Olá, eu sou o assistente de voz da Rarity Agency. Estou ligando sobre a sua solicitação de...\"\n}"
       },
-      "name": "Start GHL Call",
+      "name": "Start Conversational Call (Bland AI)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 1,
       "position": [
-        1250,
+        750,
         300
       ]
     }
@@ -145,21 +80,7 @@
     ],
     "Set Call Variables": [
       {
-        "node": "ElevenLabs TTS",
-        "type": "main",
-        "index": 0
-      }
-    ],
-    "ElevenLabs TTS": [
-      {
-        "node": "Cloudflare R2 Upload",
-        "type": "main",
-        "index": 0
-      }
-    ],
-    "Cloudflare R2 Upload": [
-      {
-        "node": "Start GHL Call",
+        "node": "Start Conversational Call (Bland AI)",
         "type": "main",
         "index": 0
       }
