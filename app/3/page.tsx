@@ -64,7 +64,7 @@ export default function GoogleAdsPage() {
       {/* Video Section - Usando componente otimizado para R2 */}
       <VideoSectionV3 
         version="1"
-        videoId="googleads"
+        videoId="novo3"
         onOpenModal={() => setIsLeadModalOpen(true)}
       />
 

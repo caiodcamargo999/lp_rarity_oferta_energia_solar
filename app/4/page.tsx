@@ -9,7 +9,7 @@ import SuccessCases from '../../components/SuccessCases'
 import LeadCaptureModal from '../../components/LeadCaptureModal'
 
 export default function HomePageV4() {
-  // Versão /4: Com delays de 4 minutos
+  // Versão /4: Com delays de 2 minutos
   const [showUrgency, setShowUrgency] = useState(false)
   const [showCTA, setShowCTA] = useState(false)
   const [isLeadModalOpen, setIsLeadModalOpen] = useState(false)
@@ -69,7 +69,7 @@ export default function HomePageV4() {
       {/* Video Section - Usando componente otimizado para R2 com timing de 4 minutos */}
       <VideoSectionV3 
         version="4" 
-        videoId="googleads"
+        videoId="novo3"
         onTimeUpdate={handleVideoTimeUpdate}
         onUrgencyChange={setShowUrgency}
         onCTAChange={setShowCTA}

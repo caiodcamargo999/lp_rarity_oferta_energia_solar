@@ -44,6 +44,18 @@ export default function VideoSectionV3({
       proxy: "/api/video-proxy-landingpages",
       local: "/video-landing-pages.mp4",
       thumbnail: "/video-thumbnail-landingpages.jpg"
+    },
+    novo3: {
+      r2: process.env.NEXT_PUBLIC_VIDEO_URL_NOVO3 || "https://pub-16c2712dc3da48989f1715cd08cfe1b1.r2.dev/video-novo-3.mp4",
+      proxy: "/api/video-proxy-novo3",
+      local: "/video-novo-3.mp4",
+      thumbnail: "/thumbmail_vsl_google_ads.png"
+    },
+    novo4: {
+      r2: process.env.NEXT_PUBLIC_VIDEO_URL_NOVO4 || "https://pub-16c2712dc3da48989f1715cd08cfe1b1.r2.dev/video-novo-4.mp4",
+      proxy: "/api/video-proxy-novo4",
+      local: "/video-novo-4.mp4",
+      thumbnail: "/thumbmail_vsl_google_ads.png"
     }
   }
 
@@ -95,16 +107,16 @@ export default function VideoSectionV3({
         if (onCTAChange) onCTAChange(true)
       }
     } else if (version === "4") {
-      // Mostrar seção de urgência após 4:00 (240 segundos) de vídeo
-      if (currentVideoTime >= 240 && !showUrgency) {
-        console.log(`⏰ [${videoId}] 4:00 atingido - Mostrando seção de urgência!`)
+      // Mostrar seção de urgência após 2:00 (120 segundos) de vídeo
+      if (currentVideoTime >= 120 && !showUrgency) {
+        console.log(`⏰ [${videoId}] 2:00 atingido - Mostrando seção de urgência!`)
         setShowUrgency(true)
         if (onUrgencyChange) onUrgencyChange(true)
       }
       
-      // Mostrar CTA após 4:20 (260 segundos) de vídeo
-      if (currentVideoTime >= 260 && !showCTA) {
-        console.log(`🎯 [${videoId}] 4:20 atingido - Mostrando CTA!`)
+      // Mostrar CTA após 2:20 (140 segundos) de vídeo
+      if (currentVideoTime >= 140 && !showCTA) {
+        console.log(`🎯 [${videoId}] 2:20 atingido - Mostrando CTA!`)
         setShowCTA(true)
         if (onCTAChange) onCTAChange(true)
       }
