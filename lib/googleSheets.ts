@@ -53,12 +53,18 @@ async function getOAuth2Client() {
 }
 
 // Configurar autenticação com Service Account (apenas para Google Sheets)
+// LAZY INITIALIZATION: Não inicializar durante build, apenas em runtime
+let auth: any = null
+let sheets: any = null
+
 const getAuth = () => {
+  if (auth) return auth
+
   const serviceAccountConfig = getServiceAccountConfig()
-  
+
   if (typeof serviceAccountConfig === 'string') {
     // Desenvolvimento - usar arquivo
-    return new google.auth.GoogleAuth({
+    auth = new google.auth.GoogleAuth({
       keyFile: serviceAccountConfig,
       scopes: [
         'https://www.googleapis.com/auth/spreadsheets'
@@ -66,28 +72,29 @@ const getAuth = () => {
     })
   } else {
     // Produção - usar objeto de credenciais
-    return new google.auth.GoogleAuth({
+    auth = new google.auth.GoogleAuth({
       credentials: serviceAccountConfig,
       scopes: [
         'https://www.googleapis.com/auth/spreadsheets'
       ]
     })
   }
+
+  console.log('🔧 Google Sheets Auth configurado:', {
+    hasAuth: !!auth,
+    serviceAccountEmail: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    hasPrivateKey: !!process.env.GOOGLE_PRIVATE_KEY,
+    spreadsheetId: process.env.GOOGLE_SPREADSHEET_ID
+  })
+
+  return auth
 }
 
-const auth = getAuth()
-
-// Criar instâncias dos serviços Google
-const sheets = google.sheets({ version: 'v4', auth })
-// Calendar será criado dinamicamente com OAuth2
-
-// Log para debug
-console.log('🔧 Google Sheets Auth configurado:', {
-  hasAuth: !!auth,
-  serviceAccountEmail: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-  hasPrivateKey: !!process.env.GOOGLE_PRIVATE_KEY,
-  spreadsheetId: process.env.GOOGLE_SPREADSHEET_ID
-})
+const getSheets = () => {
+  if (sheets) return sheets
+  sheets = google.sheets({ version: 'v4', auth: getAuth() })
+  return sheets
+}
 
 export interface LeadData {
   sourcePage: string
@@ -113,7 +120,7 @@ export interface CalendarEvent {
 export async function addLeadToSheet(leadData: LeadData): Promise<boolean> {
   try {
     const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID
-    
+
     if (!spreadsheetId) {
       throw new Error('GOOGLE_SPREADSHEET_ID not configured')
     }
@@ -135,7 +142,7 @@ export async function addLeadToSheet(leadData: LeadData): Promise<boolean> {
     console.log('📊 Range:', 'Leads!A:H')
 
     // Append the row to the sheet
-    const response = await sheets.spreadsheets.values.append({
+    const response = await getSheets().spreadsheets.values.append({
       spreadsheetId,
       range: 'Leads!A:H', // Specify the range to append to (8 colunas)
       valueInputOption: 'RAW',
@@ -158,13 +165,13 @@ export async function addLeadToSheet(leadData: LeadData): Promise<boolean> {
 export async function testGoogleSheetsConnection(): Promise<boolean> {
   try {
     const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID
-    
+
     if (!spreadsheetId) {
       throw new Error('GOOGLE_SPREADSHEET_ID not configured')
     }
 
     // Try to read the sheet to test connection
-    const response = await sheets.spreadsheets.values.get({
+    const response = await getSheets().spreadsheets.values.get({
       spreadsheetId,
       range: 'Leads!A1:G1', // Read just the header row (7 colunas)
     })
