@@ -1,0 +1,23 @@
+[build]
+  publish = "."
+  command = ""
+
+[[redirects]]
+  from = "/"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en"
+  to = "/lp_caio_rarity_offer.html"
+  status = 200
+
+[[redirects]]
+  from = "/pt"
+  to = "/lp_caio_rarity_offer_pt.html"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 404 

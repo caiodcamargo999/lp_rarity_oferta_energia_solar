@@ -1,0 +1,15 @@
+# ===== CONFIGURAÇÃO COM AMBAS AS URLs =====
+# Use esta configuração para ter desenvolvimento local E produção
+
+NEXT_PUBLIC_VIDEO_URL=https://pub-bf5dcdc4b650417585257574deb892a7.r2.dev/video-de-vendas.mp4
+R2_ACCESS_KEY_ID=18d46aaf79c9700a7041bb9253f0efc4
+R2_SECRET_ACCESS_KEY=97ab4b36e10a7338ced2485465a01ddc81f2ab6d426925a09ab8e2ca272b228f
+R2_BUCKET_NAME=vsl-solar-rarity-brasil
+NEXT_PUBLIC_SITE_URL_LOCAL=http://localhost:3000
+NEXT_PUBLIC_SITE_URL_PROD=https://rarityenergiasolar.vercel.app
+NODE_ENV=development
+
+# ===== COMO FUNCIONA =====
+# NODE_ENV=development → usa NEXT_PUBLIC_SITE_URL_LOCAL
+# NODE_ENV=production → usa NEXT_PUBLIC_SITE_URL_PROD
+# Vídeo funciona em ambos os ambientes

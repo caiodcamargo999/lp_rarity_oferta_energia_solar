@@ -1,0 +1,34 @@
+# Environment Variables - Configuração Local
+# IMPORTANTE: Renomeie este arquivo para .env.local e configure as variáveis abaixo
+
+# Site Configuration
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# ===== GOOGLE WORKSPACE INTEGRATION =====
+# IMPORTANTE: Você precisa configurar estas variáveis com seus valores reais
+
+# Google Service Account (OBRIGATÓRIO)
+# Substitua pelos valores do seu arquivo JSON da Service Account
+GOOGLE_SERVICE_ACCOUNT_EMAIL=matheusdrarity@lp-rarity-oferta-energia-solar.iam.gserviceaccount.com
+GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nSUA_PRIVATE_KEY_AQUI\n-----END PRIVATE KEY-----\n"
+GOOGLE_PRIVATE_KEY_ID=your_private_key_id_here
+GOOGLE_PROJECT_ID=lp-rarity-oferta-energia-solar
+GOOGLE_CLIENT_ID=your_client_id_here
+
+# IDs dos serviços Google
+GOOGLE_SPREADSHEET_ID=17SzKfUugqko4XZyp10WYc7GOaN7nt__vNW5PjPp5pKw
+GOOGLE_CALENDAR_ID=primary
+
+# OAuth2 (OBRIGATÓRIO para Google Calendar e Gmail)
+GOOGLE_OAUTH_CLIENT_ID=your_oauth_client_id_here
+GOOGLE_OAUTH_CLIENT_SECRET=your_oauth_client_secret_here
+GOOGLE_OAUTH_REFRESH_TOKEN=your_refresh_token_here
+
+# Email Services (OBRIGATÓRIO para confirmações)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=matheusdrarity@gmail.com
+SMTP_PASS=your_app_password_here
+
+# Video URL
+NEXT_PUBLIC_VIDEO_URL=https://pub-bf5dcdc4b650417585257574deb892a7.r2.dev/video-de-vendas.mp4

@@ -1,0 +1,49 @@
+# ===== CONFIGURAÇÃO CLOUDFLARE R2 PARA MÚLTIPLOS VÍDEOS =====
+# Copie estas variáveis para seu arquivo .env.local ou configure no Vercel
+
+# ===== VÍDEO PRINCIPAL (já configurado) =====
+NEXT_PUBLIC_VIDEO_URL=https://seu-bucket.r2.cloudflarestorage.com/video-de-vendas.mp4
+
+# ===== VÍDEO GOOGLE ADS (página /3) =====
+NEXT_PUBLIC_VIDEO_URL_GOOGLEADS=https://seu-bucket.r2.cloudflarestorage.com/video-google-ads.mp4
+
+# ===== VÍDEO LANDING PAGES (futuro) =====
+NEXT_PUBLIC_VIDEO_URL_LANDINGPAGES=https://seu-bucket.r2.cloudflarestorage.com/video-landing-pages.mp4
+
+# ===== CREDENCIAIS CLOUDFLARE R2 =====
+R2_ACCESS_KEY_ID=sua_access_key_aqui
+R2_SECRET_ACCESS_KEY=sua_secret_key_aqui
+R2_BUCKET_NAME=rarity-videos
+R2_ACCOUNT_ID=sua_account_id_aqui
+
+# ===== CONFIGURAÇÃO DO SITE =====
+NEXT_PUBLIC_SITE_URL=https://seu-dominio.com
+NEXT_PUBLIC_SITE_URL_LOCAL=http://localhost:3000
+NEXT_PUBLIC_SITE_URL_PROD=https://seu-dominio.com
+
+# ===== INSTRUÇÕES DE UPLOAD =====
+# 1. Acesse o Cloudflare Dashboard
+# 2. Vá para R2 Object Storage
+# 3. Crie um bucket chamado "rarity-videos"
+# 4. Configure o bucket como público
+# 5. Faça upload dos vídeos:
+#    - video-de-vendas.mp4 (vídeo principal)
+#    - video-google-ads.mp4 (vídeo da página /3)
+#    - video-landing-pages.mp4 (futuro)
+# 6. Copie as URLs dos vídeos e cole nas variáveis acima
+# 7. Configure as credenciais R2 no Vercel
+
+# ===== VANTAGENS DO CLOUDFLARE R2 =====
+# - 10x mais barato que Vercel Pro
+# - CDN global incluído
+# - Sem taxas de egress
+# - Suporte a vídeos grandes (1.7GB+)
+# - API S3 compatível
+# - Segurança empresarial
+
+# ===== COMANDOS ÚTEIS =====
+# Upload via CLI (se configurado):
+# aws s3 cp video-google-ads.mp4 s3://rarity-videos/ --endpoint-url=https://sua-account-id.r2.cloudflarestorage.com
+
+# Teste de URL:
+# curl -I https://sua-account-id.r2.cloudflarestorage.com/rarity-videos/video-google-ads.mp4
