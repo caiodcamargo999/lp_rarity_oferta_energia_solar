@@ -1,28 +1,7 @@
 import { google } from 'googleapis'
 import * as path from 'path'
 
-// Configuração da conta de serviço - usar variáveis de ambiente sempre
-const getServiceAccountConfig = () => {
-  // Verificar se as variáveis de ambiente estão configuradas
-  if (!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !process.env.GOOGLE_PRIVATE_KEY) {
-    throw new Error('Variáveis de ambiente GOOGLE_SERVICE_ACCOUNT_EMAIL e GOOGLE_PRIVATE_KEY são obrigatórias')
-  }
-  
-  return {
-    type: 'service_account',
-    project_id: process.env.GOOGLE_PROJECT_ID || 'lp-rarity-oferta-energia-solar',
-    private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID || '',
-    private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-    client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    client_id: process.env.GOOGLE_CLIENT_ID || '',
-    auth_uri: 'https://accounts.google.com/o/oauth2/auth',
-    token_uri: 'https://oauth2.googleapis.com/token',
-    auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
-    client_x509_cert_url: `https://www.googleapis.com/robot/v1/metadata/x509/${process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL}`
-  }
-}
-
-// Função para obter cliente OAuth2 para Google Calendar
+// Função para obter cliente OAuth2 para Google Calendar e Google Sheets
 async function getOAuth2Client() {
   const client = new google.auth.OAuth2(
     process.env.GOOGLE_OAUTH_CLIENT_ID,
@@ -52,48 +31,52 @@ async function getOAuth2Client() {
   return client;
 }
 
-// Configurar autenticação com Service Account (apenas para Google Sheets)
+// Configurar autenticação com OAuth2 (para Google Sheets)
 // LAZY INITIALIZATION: Não inicializar durante build, apenas em runtime
 let auth: any = null
 let sheets: any = null
 
-const getAuth = () => {
+const getAuth = async () => {
   if (auth) return auth
 
-  const serviceAccountConfig = getServiceAccountConfig()
+  // Usar OAuth2 em vez de Service Account
+  const client = new google.auth.OAuth2(
+    process.env.GOOGLE_OAUTH_CLIENT_ID,
+    process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+    'https://developers.google.com/oauthplayground'
+  );
 
-  if (typeof serviceAccountConfig === 'string') {
-    // Desenvolvimento - usar arquivo
-    auth = new google.auth.GoogleAuth({
-      keyFile: serviceAccountConfig,
-      scopes: [
-        'https://www.googleapis.com/auth/spreadsheets'
-      ]
-    })
+  if (process.env.GOOGLE_OAUTH_REFRESH_TOKEN) {
+    client.setCredentials({
+      refresh_token: process.env.GOOGLE_OAUTH_REFRESH_TOKEN
+    });
+
+    // Verificar se o token ainda é válido
+    try {
+      await client.getAccessToken();
+      console.log('✅ OAuth2 token válido para Google Sheets');
+    } catch (tokenError) {
+      console.error('❌ OAuth2 token expirado ou inválido:', tokenError);
+      throw new Error('OAuth2 token expirado. É necessário gerar um novo refresh token.');
+    }
   } else {
-    // Produção - usar objeto de credenciais
-    auth = new google.auth.GoogleAuth({
-      credentials: serviceAccountConfig,
-      scopes: [
-        'https://www.googleapis.com/auth/spreadsheets'
-      ]
-    })
+    throw new Error('GOOGLE_OAUTH_REFRESH_TOKEN não configurado');
   }
+
+  auth = client
 
   console.log('🔧 Google Sheets Auth configurado:', {
     hasAuth: !!auth,
-    serviceAccountEmail: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    hasPrivateKey: !!process.env.GOOGLE_PRIVATE_KEY,
+    usingOAuth2: true,
     spreadsheetId: process.env.GOOGLE_SPREADSHEET_ID
   })
 
   return auth
 }
 
-const getSheets = () => {
-  if (sheets) return sheets
-  sheets = google.sheets({ version: 'v4', auth: getAuth() })
-  return sheets
+const getSheets = async () => {
+  const authClient = await getAuth()
+  return google.sheets({ version: 'v4', auth: authClient })
 }
 
 export interface LeadData {
@@ -142,7 +125,8 @@ export async function addLeadToSheet(leadData: LeadData): Promise<boolean> {
     console.log('📊 Range:', 'Leads!A:H')
 
     // Append the row to the sheet
-    const response = await getSheets().spreadsheets.values.append({
+    const sheetsClient = await getSheets()
+    const response = await sheetsClient.spreadsheets.values.append({
       spreadsheetId,
       range: 'Leads!A:H', // Specify the range to append to (8 colunas)
       valueInputOption: 'RAW',
@@ -171,7 +155,8 @@ export async function testGoogleSheetsConnection(): Promise<boolean> {
     }
 
     // Try to read the sheet to test connection
-    const response = await getSheets().spreadsheets.values.get({
+    const sheetsClient = await getSheets()
+    const response = await sheetsClient.spreadsheets.values.get({
       spreadsheetId,
       range: 'Leads!A1:G1', // Read just the header row (7 colunas)
     })

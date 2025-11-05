@@ -210,7 +210,7 @@ export async function createOpportunity(contactId: string, opportunityData: Part
 
     const opportunityPayload = {
       pipelineId: pipelineId,
-      stageId: stageId,
+      pipelineStageId: stageId,
       name: opportunityData.name || 'Lead da Landing Page',
       monetaryValue: opportunityData.monetaryValue || 25000, // R$ 25.000 (valor padrão mencionado no formulário)
       status: 'open' as const,
@@ -323,11 +323,8 @@ export async function processLeadInGHL(leadData: {
       source: `Landing Page - ${leadData.sourcePage}`,
       timezone: 'America/Sao_Paulo',
       tags: [
-        'Landing Page',
-        '🚨 MOVER PARA REUNIÃO AGENDADA',
-        leadData.sourcePage === '/2' ? 'Página v2' : 'Página v1',
-        leadData.hasBudget === 'sim' ? 'Tem Orçamento' : 'Sem Orçamento',
-        'Lead Automático'
+        leadData.sourcePage === '/2' ? 'página v2' : 'página v1',
+        leadData.hasBudget === 'sim' ? 'tem orçamento' : 'não possui orçamento'
       ],
       customFields: [
         {

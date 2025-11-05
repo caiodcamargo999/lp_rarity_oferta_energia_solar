@@ -35,10 +35,13 @@ interface DaySlot {
 const generateAvailableDays = (): DaySlot[] => {
   const days: DaySlot[] = []
 
-  // Criar data de Brasília de forma mais precisa
+  // Obter horário de Brasília (UTC-3) de forma confiável
   const now = new Date()
-  const brasiliaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}))
+  const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000)
+  const brasiliaOffset = -3 * 60 * 60000 // UTC-3 em milissegundos
+  const brasiliaTime = new Date(utcTime + brasiliaOffset)
 
+  // Criar data sem componente de hora
   let currentDate = new Date(brasiliaTime.getFullYear(), brasiliaTime.getMonth(), brasiliaTime.getDate())
   let daysAdded = 0
 
@@ -51,15 +54,15 @@ const generateAvailableDays = (): DaySlot[] => {
   while (daysAdded < 7) {
     // Pular domingos (0 = domingo)
     if (currentDate.getDay() !== 0) {
-      // Criar ID no formato YYYY-MM-DD local (sem conversão UTC)
+      // Criar ID no formato YYYY-MM-DD
       const year = currentDate.getFullYear()
       const month = String(currentDate.getMonth() + 1).padStart(2, '0')
       const day = String(currentDate.getDate()).padStart(2, '0')
       const dateId = `${year}-${month}-${day}`
 
-      const dayName = currentDate.toLocaleDateString('pt-BR', { weekday: 'short' })
+      const dayName = currentDate.toLocaleDateString('pt-BR', { weekday: 'short', timeZone: 'America/Sao_Paulo' })
       const dayNumber = currentDate.getDate().toString().padStart(2, '0')
-      const monthName = currentDate.toLocaleDateString('pt-BR', { month: 'short' })
+      const monthName = currentDate.toLocaleDateString('pt-BR', { month: 'short', timeZone: 'America/Sao_Paulo' })
 
       days.push({
         id: dateId,
