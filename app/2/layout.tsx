@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     description: 'Dobramos suas vendas de placas solares em 90 dias. Estratégias comprovadas de marketing digital.',
     images: [
       {
-        url: '/thumbmail_1_e_2.jpg',
+        url: 'https://rarityagency.com.br/thumbmail_1_e_2.jpg',
         width: 1200,
         height: 630,
         alt: 'Rarity Agency - Especialistas em Marketing Digital para Energia Solar',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Rarity Agency - Crescimento e Vendas para Empresas de Energia Solar',
     description: 'Dobramos suas vendas de placas solares em 90 dias. Estratégias comprovadas de marketing digital.',
-    images: ['/thumbmail_1_e_2.jpg'],
+    images: ['https://rarityagency.com.br/thumbmail_1_e_2.jpg'],
   },
 }
 

@@ -16,18 +16,18 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://rarityagency.io'),
+  metadataBase: new URL('https://rarityagency.com.br'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: 'Rarity Agency - Crescimento e Vendas para Empresas de Energia Solar',
     description: 'Dobramos suas vendas de placas solares em 90 dias. Estratégias comprovadas de marketing digital.',
-    url: 'https://rarityagency.io',
+    url: 'https://rarityagency.com.br',
     siteName: 'Rarity Agency',
     images: [
       {
-        url: '/thumbmail_1_e_2.jpg',
+        url: 'https://rarityagency.com.br/thumbmail_1_e_2.jpg',
         width: 1200,
         height: 630,
         alt: 'Rarity Agency - Especialistas em Marketing Digital para Energia Solar',
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Rarity Agency - Crescimento e Vendas para Empresas de Energia Solar',
     description: 'Dobramos suas vendas de placas solares em 90 dias. Estratégias comprovadas de marketing digital.',
-    images: ['/thumbmail_1_e_2.jpg'],
+    images: ['https://rarityagency.com.br/thumbmail_1_e_2.jpg'],
   },
   robots: {
     index: true,
@@ -89,8 +89,8 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               "name": "Rarity Agency",
-              "url": "https://rarityagency.io",
-              "logo": "https://rarityagency.io/rarity_logo.png",
+              "url": "https://rarityagency.com.br",
+              "logo": "https://rarityagency.com.br/rarity_logo.png",
               "description": "Especialistas em Marketing Digital para Empresas de Energia Solar",
               "address": {
                 "@type": "PostalAddress",
@@ -102,7 +102,7 @@ export default function RootLayout({
                 "availableLanguage": "Portuguese"
               },
               "sameAs": [
-                "https://rarityagency.io"
+                "https://rarityagency.com.br"
               ]
             })
           }}

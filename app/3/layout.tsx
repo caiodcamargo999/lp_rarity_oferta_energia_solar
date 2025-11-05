@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     description: 'Capture clientes que já estão procurando energia solar no Google. Anúncios ultra-segmentados e landing pages de alta conversão.',
     images: [
       {
-        url: '/thumbmail_3_e_4.jpg',
+        url: 'https://rarityagency.com.br/thumbmail_3_e_4.jpg',
         width: 1200,
         height: 630,
         alt: 'Rarity Agency - Google Ads e Landing Pages para Energia Solar',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Rarity Agency - Google Ads e Landing Pages para Energia Solar',
     description: 'Capture clientes que já estão procurando energia solar no Google. Anúncios ultra-segmentados e landing pages de alta conversão.',
-    images: ['/thumbmail_3_e_4.jpg'],
+    images: ['https://rarityagency.com.br/thumbmail_3_e_4.jpg'],
   },
 }
 
