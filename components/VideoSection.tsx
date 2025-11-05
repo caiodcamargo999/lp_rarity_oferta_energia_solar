@@ -35,9 +35,9 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
   // ===== THUMBNAIL OTIMIZADO =====
   const thumbnailSources = {
     // 1. Thumbnail otimizado (se existir)
-    optimized: "/video-thumbnail-eyes-open.jpg",
+    optimized: "/thumbmail_1_e_2.jpg",
     // 2. Thumbnail atual (fallback)
-    current: "/thumbmail_vsl.png"
+    current: "/thumbmail_1_e_2.jpg"
   }
 
   // ===== DETERMINAR MELHOR FONTE DE VÍDEO =====

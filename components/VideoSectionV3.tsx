@@ -49,13 +49,13 @@ export default function VideoSectionV3({
       r2: process.env.NEXT_PUBLIC_VIDEO_URL_NOVO3 || "https://pub-16c2712dc3da48989f1715cd08cfe1b1.r2.dev/video-novo-3.mp4",
       proxy: "/api/video-proxy-novo3",
       local: "/video-novo-3.mp4",
-      thumbnail: "/thumbmail_vsl_google_ads.png"
+      thumbnail: "/thumbmail_3_e_4.jpg"
     },
     novo4: {
       r2: process.env.NEXT_PUBLIC_VIDEO_URL_NOVO4 || "https://pub-16c2712dc3da48989f1715cd08cfe1b1.r2.dev/video-novo-4.mp4",
       proxy: "/api/video-proxy-novo4",
       local: "/video-novo-4.mp4",
-      thumbnail: "/thumbmail_vsl_google_ads.png"
+      thumbnail: "/thumbmail_3_e_4.jpg"
     }
   }
 
