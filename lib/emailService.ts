@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer'
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.SMTP_USER || 'matheusdrarity@gmail.com',
+    user: process.env.SMTP_USER || 'caiorarity@gmail.com',
     pass: process.env.SMTP_PASS || ''
   }
 })
@@ -20,7 +20,7 @@ export interface EmailData {
 export async function sendConfirmationEmail(emailData: EmailData): Promise<boolean> {
   try {
     const { to, name, scheduledDateTime, meetLink, sourcePage } = emailData
-    
+
     // Formatar data e hora
     const date = new Date(scheduledDateTime)
     const formattedDate = date.toLocaleDateString('pt-BR', {
@@ -33,7 +33,7 @@ export async function sendConfirmationEmail(emailData: EmailData): Promise<boole
       hour: '2-digit',
       minute: '2-digit'
     })
-    
+
     // Template do email
     const htmlContent = `
       <!DOCTYPE html>
@@ -79,7 +79,7 @@ export async function sendConfirmationEmail(emailData: EmailData): Promise<boole
             <ol>
               <li><strong>15 minutos antes:</strong> Teste seu microfone e câmera</li>
               <li><strong>5 minutos antes:</strong> Clique no link do Google Meet</li>
-              <li><strong>No horário:</strong> Aguarde o Matheus entrar na sala</li>
+              <li><strong>No horário:</strong> Aguarde o consultor entrar na sala</li>
             </ol>
             
             <h3>🎯 O que esperar da sessão:</h3>
@@ -109,20 +109,20 @@ export async function sendConfirmationEmail(emailData: EmailData): Promise<boole
       </body>
       </html>
     `
-    
+
     // Enviar email
     const mailOptions = {
-      from: '"Rarity Agency" <matheusdrarity@gmail.com>',
+      from: '"Rarity Agency" <caiorarity@gmail.com>',
       to: to,
       subject: '🎯 Sessão Estratégica Confirmada - Rarity Agency',
       html: htmlContent
     }
-    
+
     await transporter.sendMail(mailOptions)
-    
+
     console.log('✅ Email de confirmação enviado para:', to)
     return true
-    
+
   } catch (error) {
     console.error('❌ Erro ao enviar email de confirmação:', error)
     throw error
@@ -132,7 +132,7 @@ export async function sendConfirmationEmail(emailData: EmailData): Promise<boole
 export async function sendTeamNotification(emailData: EmailData): Promise<boolean> {
   try {
     const { name, scheduledDateTime, meetLink, sourcePage } = emailData
-    
+
     // Formatar data e hora
     const date = new Date(scheduledDateTime)
     const formattedDate = date.toLocaleDateString('pt-BR', {
@@ -145,7 +145,7 @@ export async function sendTeamNotification(emailData: EmailData): Promise<boolea
       hour: '2-digit',
       minute: '2-digit'
     })
-    
+
     // Template do email para a equipe
     const htmlContent = `
       <!DOCTYPE html>
@@ -189,20 +189,20 @@ export async function sendTeamNotification(emailData: EmailData): Promise<boolea
       </body>
       </html>
     `
-    
+
     // Enviar email para a equipe
     const mailOptions = {
-      from: '"Rarity Agency" <matheusdrarity@gmail.com>',
-      to: 'matheusdrarity@gmail.com, caiorarity@gmail.com',
+      from: '"Rarity Agency" <caiorarity@gmail.com>',
+      to: 'caiorarity@gmail.com',
       subject: '🎯 Novo Lead Agendado - Rarity Agency',
       html: htmlContent
     }
-    
+
     await transporter.sendMail(mailOptions)
-    
+
     console.log('✅ Notificação para equipe enviada')
     return true
-    
+
   } catch (error) {
     console.error('❌ Erro ao enviar notificação para equipe:', error)
     throw error
@@ -215,7 +215,7 @@ export async function testEmailConnection(): Promise<boolean> {
     await transporter.verify()
     console.log('✅ Conexão de email testada com sucesso')
     return true
-    
+
   } catch (error) {
     console.error('❌ Erro ao testar conexão de email:', error)
     throw error

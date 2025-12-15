@@ -6,8 +6,9 @@ interface RequestData {
   name: string
   whatsapp: string
   email: string
+  company: string
+  revenue: string
   painPoint: string
-  budget: string
   scheduledDate: string | null
   scheduledTime: string | null
   sourcePage?: string
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
     const requestData: RequestData = await request.json()
 
     // Validação básica
-    if (!requestData.name || !requestData.email || !requestData.whatsapp || !requestData.painPoint || !requestData.budget) {
+    if (!requestData.name || !requestData.email || !requestData.whatsapp || !requestData.company || !requestData.revenue || !requestData.painPoint) {
       return NextResponse.json(
         { error: 'Todos os campos são obrigatórios' },
         { status: 400 }
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
     // Determine source page from referer or default to '/'
     const referer = request.headers.get('referer') || ''
     let sourcePage = requestData.sourcePage || '/'
-    
+
     // If no source page specified, try to determine from referer
     if (!requestData.sourcePage) {
       if (referer.includes('/2')) {
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create scheduled date time string (only if has budget)
-    const scheduledDateTime = requestData.scheduledDate && requestData.scheduledTime 
+    const scheduledDateTime = requestData.scheduledDate && requestData.scheduledTime
       ? `${requestData.scheduledDate} ${requestData.scheduledTime}`
       : 'Não agendado'
 
@@ -78,8 +79,10 @@ export async function POST(request: NextRequest) {
       name: requestData.name.trim(),
       whatsapp: requestData.whatsapp.trim(),
       email: requestData.email.trim(),
+      company: requestData.company.trim(),
+      revenue: requestData.revenue.trim(),
       painPoint: requestData.painPoint.trim(),
-      hasBudget: requestData.hasBudget || (requestData.budget === 'Sim, tenho.' ? 'sim' : 'não'),
+      hasBudget: requestData.hasBudget || 'sim',
       scheduledDateTime,
       timestamp: new Date().toISOString()
     }
@@ -110,9 +113,11 @@ export async function POST(request: NextRequest) {
         painPoint: leadData.painPoint,
         hasBudget: leadData.hasBudget,
         sourcePage: leadData.sourcePage,
-        scheduledDateTime: leadData.scheduledDateTime
+        scheduledDateTime: leadData.scheduledDateTime,
+        company: leadData.company,
+        revenue: leadData.revenue
       })
-      
+
       if (ghlResult.success) {
         console.log('✅ Lead adicionado ao Go High Level com sucesso!')
         console.log('📞 Contato ID:', ghlResult.contact?.id)
@@ -144,7 +149,7 @@ export async function POST(request: NextRequest) {
     // 3. Create Google Calendar event (only if has budget)
     let eventId = ''
     let meetLink = ''
-    
+
     if (leadData.hasBudget === 'sim' && requestData.scheduledDate && requestData.scheduledTime) {
       try {
         const eventData = {
@@ -153,26 +158,28 @@ export async function POST(request: NextRequest) {
           
 Dor principal: ${leadData.painPoint}
 WhatsApp: ${leadData.whatsapp}
+Empresa: ${leadData.company}
+Faturamento: ${leadData.revenue}
 Página de origem: ${sourcePage}
 Tem orçamento: ${leadData.hasBudget}
 
 Sessão estratégica gratuita para análise do negócio de energia solar e criação de plano de crescimento.`,
           startTime: new Date(scheduledDateTime).toISOString(),
           endTime: new Date(new Date(scheduledDateTime).getTime() + 60 * 60 * 1000).toISOString(), // +1 hora
-          attendees: [leadData.email, 'matheusdrarity@gmail.com', 'caiorarity@gmail.com']
+          attendees: [leadData.email, 'caiorarity@gmail.com']
         }
 
         const calendarResult = await createCalendarEvent(eventData)
         eventId = calendarResult.eventId
         meetLink = calendarResult.meetLink
-        
+
         console.log('✅ Evento criado no Google Calendar:', eventId)
         console.log('🔗 Link do Google Meet:', meetLink)
-        
+
         // O Google Calendar enviará automaticamente os emails nativos para todos os participantes
         console.log('📧 Emails nativos do Google Calendar serão enviados automaticamente')
         integrationResults.calendar = true
-        
+
       } catch (calendarError) {
         console.error('❌ Erro ao criar evento no Google Calendar:', calendarError)
         // Continue processing even if Calendar fails
@@ -195,8 +202,8 @@ Sessão estratégica gratuita para análise do negócio de energia solar e cria�
         hasBudget: leadData.hasBudget
       },
       integrations: integrationResults,
-      redirectUrl: leadData.hasBudget === 'não' ? 
-        `https://wa.me/5548991369301?text=${encodeURIComponent('Olá Matheus, vim do formulário da página da Rarity. No momento não tenho o orçamento mínimo disponível, mas gostaria de saber se existe alguma alternativa ou próximo passo para mim.')}` 
+      redirectUrl: leadData.hasBudget === 'não' ?
+        `https://wa.me/5548991369301?text=${encodeURIComponent('Olá Matheus, vim do formulário da página da Rarity. No momento não tenho o orçamento mínimo disponível, mas gostaria de saber se existe alguma alternativa ou próximo passo para mim.')}`
         : null,
       eventId,
       meetLink
@@ -204,9 +211,9 @@ Sessão estratégica gratuita para análise do negócio de energia solar e cria�
 
   } catch (error) {
     console.error('❌ Erro ao processar lead:', error)
-    
+
     return NextResponse.json(
-      { 
+      {
         error: 'Erro interno do servidor',
         details: error instanceof Error ? error.message : 'Erro desconhecido'
       },
@@ -220,7 +227,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const date = searchParams.get('date')
-    
+
     if (!date) {
       return NextResponse.json(
         { error: 'Parâmetro "date" é obrigatório' },
@@ -229,18 +236,18 @@ export async function GET(request: NextRequest) {
     }
 
     const availableSlots = await getAvailableTimeSlots(date)
-    
+
     return NextResponse.json({
       success: true,
       date,
       availableSlots
     })
-    
+
   } catch (error) {
     console.error('❌ Erro ao buscar horários disponíveis:', error)
-    
+
     return NextResponse.json(
-      { 
+      {
         error: 'Erro ao buscar horários disponíveis',
         details: error instanceof Error ? error.message : 'Erro desconhecido'
       },

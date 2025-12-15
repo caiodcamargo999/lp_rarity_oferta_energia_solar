@@ -13,13 +13,13 @@ interface VideoSectionV3Props {
   onOpenModal?: () => void
 }
 
-export default function VideoSectionV3({ 
-  version = "1", 
+export default function VideoSectionV3({
+  version = "1",
   videoId = "default",
-  onTimeUpdate, 
-  onUrgencyChange, 
-  onCTAChange, 
-  onOpenModal 
+  onTimeUpdate,
+  onUrgencyChange,
+  onCTAChange,
+  onOpenModal
 }: VideoSectionV3Props) {
   const [showCTA, setShowCTA] = useState(false)
   const [showUrgency, setShowUrgency] = useState(false)
@@ -67,19 +67,19 @@ export default function VideoSectionV3({
   // ===== DETERMINAR MELHOR FONTE DE VÍDEO COM FALLBACKS =====
   const getBestVideoSource = () => {
     const config = getVideoConfig()
-    
+
     // Prioridade: R2 > Proxy > Local
     if (config.r2 && !config.r2.includes('seu-bucket.r2.cloudflarestorage.com')) {
       console.log(`🎬 [${videoId}] Usando URL pública do R2:`, config.r2)
       return config.r2
     }
-    
+
     // Fallback para API Proxy
     if (config.proxy) {
       console.log(`🎬 [${videoId}] Usando API Proxy como fallback`)
       return config.proxy
     }
-    
+
     // Último fallback para local
     console.log(`🎬 [${videoId}] Usando vídeo local como último recurso`)
     return config.local
@@ -99,7 +99,7 @@ export default function VideoSectionV3({
         setShowUrgency(true)
         if (onUrgencyChange) onUrgencyChange(true)
       }
-      
+
       // Mostrar CTA após 1:20 (80 segundos) de vídeo
       if (currentVideoTime >= 80 && !showCTA) {
         console.log(`🎯 [${videoId}] 1:20 atingido - Mostrando CTA!`)
@@ -113,7 +113,7 @@ export default function VideoSectionV3({
         setShowUrgency(true)
         if (onUrgencyChange) onUrgencyChange(true)
       }
-      
+
       // Mostrar CTA após 2:20 (140 segundos) de vídeo
       if (currentVideoTime >= 140 && !showCTA) {
         console.log(`🎯 [${videoId}] 2:20 atingido - Mostrando CTA!`)
@@ -139,7 +139,7 @@ export default function VideoSectionV3({
   }
 
   return (
-    <motion.section 
+    <motion.section
       className="py-12 px-4 text-center"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -151,32 +151,34 @@ export default function VideoSectionV3({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="mb-6"
+          className="mb-8"
         >
           <h2 className="text-lg font-semibold text-text-primary">
             ASSISTA COMO FUNCIONA
           </h2>
-          
-          {/* Flechinha para baixo */}
+
+          {/* Flechinha para baixo - ESTILO SILICON VALLEY */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="mt-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.5 }}
+            className="mt-2"
           >
-            <svg
-              className="w-6 h-6 mx-auto text-text-primary animate-bounce"
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2}
-                d="M19 14l-7 7m0 0l-7-7m7 7V3"
-              />
-            </svg>
+            <div className="w-8 h-8 mx-auto flex items-center justify-center rounded-full bg-white/5 border border-white/10 backdrop-blur-sm animate-float">
+              <svg
+                className="w-4 h-4 text-purple-400 drop-shadow-[0_0_5px_rgba(168,85,247,0.8)]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                />
+              </svg>
+            </div>
           </motion.div>
         </motion.div>
 
@@ -203,8 +205,8 @@ export default function VideoSectionV3({
           </div>
         </motion.div>
 
-      {/* CTA Button - Sempre visível na versão 1, com delays nas versões 2 e 4 */}
-      {(version === "1" || showCTA) && (
+        {/* CTA Button - Sempre visível na versão 1, com delays nas versões 2 e 4 */}
+        {(version === "1" || showCTA) && (
           <motion.div
             className="mt-8 flex justify-center w-full"
             initial={{ opacity: 0, y: 20 }}
@@ -232,7 +234,7 @@ export default function VideoSectionV3({
               ⚠️ ATENÇÃO: Oportunidade Limitada!
             </h3>
             <p className="text-text-secondary mb-4">
-              Esta estratégia está funcionando para empresas de energia solar e as vagas são limitadas. 
+              Esta estratégia está funcionando para empresas de energia solar e as vagas são limitadas.
               Não perca a chance de transformar seu negócio!
             </p>
           </motion.div>

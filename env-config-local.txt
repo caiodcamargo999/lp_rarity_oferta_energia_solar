@@ -9,7 +9,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 # Google Service Account (OBRIGATÓRIO)
 # Substitua pelos valores do seu arquivo JSON da Service Account
-GOOGLE_SERVICE_ACCOUNT_EMAIL=matheusdrarity@lp-rarity-oferta-energia-solar.iam.gserviceaccount.com
+GOOGLE_SERVICE_ACCOUNT_EMAIL=caiorarity@lp-rarity-oferta-energia-solar.iam.gserviceaccount.com
 GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nSUA_PRIVATE_KEY_AQUI\n-----END PRIVATE KEY-----\n"
 GOOGLE_PRIVATE_KEY_ID=your_private_key_id_here
 GOOGLE_PROJECT_ID=lp-rarity-oferta-energia-solar
@@ -27,7 +27,7 @@ GOOGLE_OAUTH_REFRESH_TOKEN=your_refresh_token_here
 # Email Services (OBRIGATÓRIO para confirmações)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USER=matheusdrarity@gmail.com
+SMTP_USER=caiorarity@gmail.com
 SMTP_PASS=your_app_password_here
 
 # Video URL

@@ -18,14 +18,14 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
   const [currentVideoTime, setCurrentVideoTime] = useState(0)
 
   // ===== DETECÇÃO AUTOMÁTICA DE AMBIENTE =====
-  const siteUrl = process.env.NODE_ENV === 'development' 
-    ? process.env.NEXT_PUBLIC_SITE_URL_LOCAL 
+  const siteUrl = process.env.NODE_ENV === 'development'
+    ? process.env.NEXT_PUBLIC_SITE_URL_LOCAL
     : process.env.NEXT_PUBLIC_SITE_URL_PROD;
 
   // ===== FONTES DE VÍDEO OTIMIZADAS PARA R2 =====
   const videoSources = {
     // 1. Cloudflare R2 (principal)
-    r2: process.env.NEXT_PUBLIC_VIDEO_URL || "https://seu-bucket.r2.cloudflarestorage.com/video-de-vendas.mp4",
+    r2: process.env.NEXT_PUBLIC_VIDEO_URL || process.env.NEXT_PUBLIC_VIDEO_URL_DEFAULT || "https://seu-bucket.r2.cloudflarestorage.com/video-de-vendas.mp4",
     // 2. API Proxy (fallback)
     proxy: "/api/video-proxy",
     // 3. Vídeo local (fallback para desenvolvimento)
@@ -58,22 +58,23 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
   }
 
   useEffect(() => {
-      // Apenas na versão 2: mostrar seções com delays
-      if (version === "2") {
-        // Mostrar seção de urgência após 1:00 (60 segundos) de vídeo
-      if (currentVideoTime >= 60 && !showUrgency) {
-          console.log('⏰ 1:00 atingido - Mostrando seção de urgência!')
-          setShowUrgency(true)
-          if (onUrgencyChange) onUrgencyChange(true)
-        }
-        
-      // Mostrar CTA após 1:20 (80 segundos) de vídeo
-      if (currentVideoTime >= 80 && !showCTA) {
-        console.log('🎯 1:20 atingido - Mostrando CTA!')
-          setShowCTA(true)
-          if (onCTAChange) onCTAChange(true)
-        }
+    // Apenas na versão 2: mostrar seções com delays
+    // Apenas na versão 2: mostrar seções com delays
+    if (version === "2") {
+      // Mostrar seções de baixo (urgência e provas sociais) após 2:00 (120 segundos)
+      if (currentVideoTime >= 120 && !showUrgency) {
+        console.log('⏰ 2:00 atingido - Mostrando seção de urgência!')
+        setShowUrgency(true)
+        if (onUrgencyChange) onUrgencyChange(true)
       }
+
+      // Mostrar CTA após 2:00 (120 segundos)
+      if (currentVideoTime >= 120 && !showCTA) {
+        console.log('🎯 2:00 atingido - Mostrando CTA!')
+        setShowCTA(true)
+        if (onCTAChange) onCTAChange(true)
+      }
+    }
   }, [currentVideoTime, version, showUrgency, showCTA, onUrgencyChange, onCTAChange])
 
   const handleVideoTimeUpdate = (time: number) => {
@@ -92,7 +93,7 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
   }
 
   return (
-    <motion.section 
+    <motion.section
       className="py-12 px-4 text-center"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -104,32 +105,34 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="mb-6"
+          className="mb-8"
         >
           <h2 className="text-lg font-semibold text-text-primary">
-          ASSISTA COMO FUNCIONA
+            ASSISTA COMO FUNCIONA
           </h2>
-          
-          {/* Flechinha para baixo - RESTAURADA */}
+
+          {/* Flechinha para baixo - ESTILO SILICON VALLEY */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="mt-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.5 }}
+            className="mt-2"
           >
-            <svg
-              className="w-6 h-6 mx-auto text-text-primary animate-bounce"
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-                strokeWidth={2}
-              d="M19 14l-7 7m0 0l-7-7m7 7V3"
-            />
-          </svg>
+            <div className="w-8 h-8 mx-auto flex items-center justify-center rounded-full bg-white/5 border border-white/10 backdrop-blur-sm animate-float">
+              <svg
+                className="w-4 h-4 text-purple-400 drop-shadow-[0_0_5px_rgba(168,85,247,0.8)]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                />
+              </svg>
+            </div>
           </motion.div>
         </motion.div>
 
@@ -152,22 +155,22 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
           </div>
         </motion.div>
 
-      {/* CTA Button - Sempre visível na versão 1, com delays na versão 2 */}
-      {(version === "1" || showCTA) && (
-        <motion.div
+        {/* CTA Button - Sempre visível na versão 1, com delays na versão 2 */}
+        {(version === "1" || showCTA) && (
+          <motion.div
             className="mt-8 flex justify-center w-full"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <button
               onClick={onOpenModal}
               className="btn-minimal w-full max-w-md bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white font-bold py-4 px-8 rounded-xl transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
-          >
-            AGENDAR SESSÃO ESTRATÉGICA
+            >
+              AGENDAR SESSÃO ESTRATÉGICA
             </button>
-        </motion.div>
-      )}
+          </motion.div>
+        )}
 
         {/* Seção de Urgência - Apenas na versão 2 com delay */}
         {version === "2" && showUrgency && (
@@ -181,10 +184,10 @@ export default function VideoSection({ version = "1", onTimeUpdate, onUrgencyCha
               ⚠️ ATENÇÃO: Oportunidade Limitada!
             </h3>
             <p className="text-text-secondary mb-4">
-              Esta estratégia está funcionando para empresas de energia solar e as vagas são limitadas. 
+              Esta estratégia está funcionando para empresas de energia solar e as vagas são limitadas.
               Não perca a chance de transformar seu negócio!
             </p>
-    </motion.div>
+          </motion.div>
         )}
       </div>
     </motion.section>

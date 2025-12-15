@@ -69,7 +69,7 @@ Este é o guia definitivo para implementar um sistema completo de captação de 
 - ✅ **Cache Otimizado**: Sistema de cache de 1 minuto para performance
 
 #### **3. Integração Google Calendar**
-- ✅ Criação automática de eventos no calendário matheusdrarity@gmail.com
+- ✅ Criação automática de eventos no calendário caiorarity@gmail.com
 - ✅ Link do Google Meet gerado automaticamente
 - ✅ RSVP ativado para o lead
 - ✅ Descrição completa com dados do lead
@@ -681,7 +681,7 @@ animate={{ scale: 1, opacity: 1, y: 0 }}
 - Summary: "Sessão Estratégica - [Nome]"
 - Duração: 60 minutos
 - Google Meet: automático
-- Attendees: lead + matheusdrarity@gmail.com
+- Attendees: lead + caiorarity@gmail.com
 - Reminders: 24h, 2h, 15min
 ```
 
@@ -782,7 +782,7 @@ animate={{ scale: 1, opacity: 1, y: 0 }}
 
 #### **Erro: "Invalid refresh token"**
 - Gere um novo refresh token no OAuth Playground
-- Certifique-se de estar usando a conta correta (matheusdrarity@gmail.com)
+- Certifique-se de estar usando a conta correta (caiorarity@gmail.com)
 
 #### **Erro: "Permission denied" no Sheets**
 - Verifique se o ID da planilha está correto

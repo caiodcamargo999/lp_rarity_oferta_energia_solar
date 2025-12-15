@@ -1,125 +1,116 @@
 'use client'
 
 import { Button } from '@/components/ui/Button'
-import { ArrowRight, Play, CheckCircle, Star, Zap } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import Link from 'next/link'
 import VideoSection from '../components/VideoSection'
 import SuccessCases from '../components/SuccessCases'
 import LeadCaptureModal from '../components/LeadCaptureModal'
 import { useState } from 'react'
 
 export default function HomePage() {
-  // Página raiz (/) - Todas as seções aparecem desde o começo
   const [showUrgency, setShowUrgency] = useState(false)
   const [showCTA, setShowCTA] = useState(false)
   const [isLeadModalOpen, setIsLeadModalOpen] = useState(false)
 
-  // ===== DETECÇÃO AUTOMÁTICA DE AMBIENTE =====
-  const siteUrl = process.env.NODE_ENV === 'development' 
-    ? process.env.NEXT_PUBLIC_SITE_URL_LOCAL 
-    : process.env.NEXT_PUBLIC_SITE_URL_PROD;
-
   const handleVideoTimeUpdate = (time: number) => {
-    // Versão 1: sempre mostrar tudo
-    // Versão 2: timing controlado pelo VideoSection
+    // Logic for timing if needed
   }
 
   return (
-    <main className="min-h-screen w-full">
-      {/* Header Section - Logo centralizada */}
-      <motion.header 
-        className="absolute top-0 left-0 right-0 z-50 p-8 flex justify-center"
+    <main className="min-h-screen w-full overflow-hidden relative">
+      <div className="absolute top-0 left-0 w-full h-[500px] bg-primary-500/10 blur-[120px] rounded-full pointer-events-none" />
+
+      {/* Header */}
+      <motion.header
+        className="relative z-50 pt-8 pb-4 flex justify-center"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, ease: "easeOut" }}
+        transition={{ duration: 0.8 }}
       >
-        <div className="w-48 h-32 md:w-64 md:h-40">
+        <div className="w-40 md:w-52">
           <Image
             src="/rarity_logo.png"
             alt="Rarity Agency Logo"
-            width={256}
-            height={160}
-            className="w-full h-auto object-contain"
+            width={208}
+            height={130}
+            className="w-full h-auto object-contain drop-shadow-2xl"
             priority
           />
         </div>
       </motion.header>
 
-      {/* Hero Section - Copywriting focado em energia solar */}
-      <motion.section 
-        className="pt-24 md:pt-28 px-4 text-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.5, ease: "easeOut" }}
+      {/* Hero Section */}
+      <motion.section
+        className="relative z-10 pt-12 pb-8 px-4 text-center"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8 }}
       >
-        <div className="max-w-4xl mx-auto">
-          {/* ===== TÍTULO PRINCIPAL COM TIPOGRAFIA DESIGNERFLIX ===== */}
-          <h1 className="text-h1 font-bold text-text-primary mb-6 leading-tight tracking-tight">
-            <span className="gradient-text">DOBRE</span> suas Vendas de Placas Solares<br/>
-            <span className="text-h3 font-semibold text-text-secondary mt-4 block">
-              em 90 dias
+        <div className="max-w-5xl mx-auto space-y-6">
+          {/* Glass Pill Tag */}
+          <motion.div
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="mb-4"
+          >
+            <span className="glass-pill text-xs md:text-sm tracking-widest">
+              <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse shadow-[0_0_8px_rgba(168,85,247,0.8)]"></span>
+              MÉTODO EXCLUSIVO PARA INTEGRADORES SOLARES
             </span>
+          </motion.div>
+
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight text-white">
+            Transforme Desconhecidos em <br className="hidden md:block" />
+            <span className="gradient-text text-glow">Clientes de Energia Solar</span>
           </h1>
-          
-          {/* ===== SUBTÍTULO COM TIPOGRAFIA DESIGNERFLIX ===== */}
-          <p className="text-body text-text-secondary mb-8 max-w-3xl mx-auto leading-relaxed tracking-normal">
-            <strong className="text-text-primary">Empresas de energia solar</strong> estão perdendo milhões em vendas por não usar <span className="gradient-text">IA + Anúncios Online</span>. 
-            <br/><br/>
-            Nós implementamos sistemas que <strong className="text-text-primary">automatizam 80% do processo de vendas</strong> e multiplicam seus resultados usando estratégias comprovadas de <span className="gradient-text">copywriting persuasivo</span>, <span className="text-primary">automação inteligente</span> e <span className="text-primary">anúncios online em escala</span>.
+
+          <p className="text-lg md:text-2xl text-text-secondary max-w-3xl mx-auto leading-relaxed font-light">
+            Instale uma <strong className="text-white font-semibold">Máquina de Vendas Automática</strong> que atrai, qualifica e agenda reuniões com leads prontos para fechar contrato. <span className="text-primary-400">Sem depender de indicações.</span>
           </p>
         </div>
       </motion.section>
 
-      {/* Video Section - Versão sem delays */}
-      <VideoSection 
-        version="1" 
-        onTimeUpdate={handleVideoTimeUpdate}
-        onUrgencyChange={setShowUrgency}
-        onCTAChange={setShowCTA}
-        onOpenModal={() => setIsLeadModalOpen(true)}
-      />
+      {/* Video Section */}
+      <div className="relative z-20">
+        <VideoSection
+          version="1"
+          onTimeUpdate={handleVideoTimeUpdate}
+          onUrgencyChange={setShowUrgency}
+          onCTAChange={setShowCTA}
+          onOpenModal={() => setIsLeadModalOpen(true)}
+        />
+      </div>
 
-      {/* Success Cases Section */}
-      <SuccessCases 
-        version="1" 
-        showUrgency={showUrgency}
-        showCTA={showCTA}
-      />
+      {/* Success Cases */}
+      <div className="max-w-6xl mx-auto px-4 py-16">
+        <SuccessCases
+          version="1"
+          showUrgency={showUrgency}
+          showCTA={showCTA}
+        />
+      </div>
 
       {/* Footer */}
-      <footer className="text-center py-8 border-t border-white/10">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-body text-text-secondary mb-4">
-            Transforme sua empresa de energia solar em uma máquina de vendas
+      <footer className="text-center py-12 border-t border-white/5 bg-black/20 backdrop-blur-lg">
+        <div className="max-w-4xl mx-auto px-4">
+          <p className="text-text-secondary mb-6 text-sm">
+            &copy; 2025 Rarity Agency. Todos os direitos reservados.
+            <br />Especialistas em Escala para Energia Solar.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-            <a 
-              href="https://rarityagency.io" 
-              className="text-primary-500 hover:text-primary-400 transition-colors"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Visit rarityagency.io
+          <div className="flex items-center justify-center gap-6 text-sm font-medium">
+            <a href="https://rarityagency.io" target="_blank" className="text-white/60 hover:text-primary-400 transition-colors">
+              Site Oficial
             </a>
-            <span className="text-text-secondary">|</span>
-            <a 
-              href="https://www.instagram.com/rarity.brasil/" 
-              className="text-primary-500 hover:text-primary-400 transition-colors"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Follow @rarity.brasil
+            <a href="https://www.instagram.com/rarity.solar" target="_blank" className="text-white/60 hover:text-primary-400 transition-colors">
+              Instagram
             </a>
           </div>
-          <p className="text-small text-text-secondary">
-            Rarity Agency © 2025 | Especialistas em Marketing Digital para Energia Solar
-          </p>
         </div>
       </footer>
 
-      {/* Modal de Captação de Leads */}
+      {/* Modal */}
       <LeadCaptureModal
         isOpen={isLeadModalOpen}
         onClose={() => setIsLeadModalOpen(false)}

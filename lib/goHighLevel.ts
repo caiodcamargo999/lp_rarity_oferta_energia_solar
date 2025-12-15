@@ -87,7 +87,7 @@ export const getGHLConfig = () => {
 export async function createOrUpdateContact(contactData: GHLContact): Promise<GHLResponse> {
   try {
     const config = getGHLConfig()
-    
+
     console.log('🔗 Criando contato no Go High Level:', contactData.email)
 
     // Primeiro, verificar se o contato já existe
@@ -100,11 +100,11 @@ export async function createOrUpdateContact(contactData: GHLContact): Promise<GH
     )
 
     const searchResult = await searchResponse.json()
-    
+
     if (searchResult.contact) {
       // Contato já existe, vamos atualizar
       console.log('📝 Contato já existe, atualizando dados...')
-      
+
       const updateResponse = await fetch(
         `${config.baseUrl}/contacts/${searchResult.contact.id}`,
         {
@@ -115,7 +115,7 @@ export async function createOrUpdateContact(contactData: GHLContact): Promise<GH
       )
 
       const updateResult = await updateResponse.json()
-      
+
       if (updateResponse.ok) {
         console.log('✅ Contato atualizado no GHL:', updateResult.contact?.id)
         return {
@@ -129,7 +129,7 @@ export async function createOrUpdateContact(contactData: GHLContact): Promise<GH
     } else {
       // Contato não existe, vamos criar
       console.log('👤 Criando novo contato...')
-      
+
       const createResponse = await fetch(
         `${config.baseUrl}/contacts/`,
         {
@@ -143,7 +143,7 @@ export async function createOrUpdateContact(contactData: GHLContact): Promise<GH
       )
 
       const createResult = await createResponse.json()
-      
+
       if (createResponse.ok) {
         console.log('✅ Contato criado no GHL:', createResult.contact?.id)
         return {
@@ -306,6 +306,8 @@ export async function processLeadInGHL(leadData: {
   hasBudget: string
   sourcePage: string
   scheduledDateTime?: string
+  company?: string
+  revenue?: string
 }): Promise<GHLResponse> {
   try {
     console.log('🚀 Processando lead completo no Go High Level:', leadData.email)
@@ -320,6 +322,7 @@ export async function processLeadInGHL(leadData: {
       name: leadData.name,
       email: leadData.email,
       phone: leadData.whatsapp.replace(/\D/g, ''), // Remove formatação do telefone
+      companyName: leadData.company,
       source: `Landing Page - ${leadData.sourcePage}`,
       timezone: 'America/Sao_Paulo',
       tags: [
@@ -342,13 +345,17 @@ export async function processLeadInGHL(leadData: {
         {
           key: 'data_hora_agendamento',
           value: leadData.scheduledDateTime || 'Não agendado'
+        },
+        {
+          key: 'faturamento',
+          value: leadData.revenue || 'Não informado'
         }
       ]
     }
 
     // 2. Criar ou atualizar contato
     const contactResult = await createOrUpdateContact(contactData)
-    
+
     if (!contactResult.success || !contactResult.contact) {
       throw new Error(`Falha ao processar contato: ${contactResult.message}`)
     }
@@ -364,6 +371,8 @@ Lead capturado da landing page ${leadData.sourcePage}
 
 Maior Dor/Desafio: ${leadData.painPoint}
 Tem Orçamento: ${leadData.hasBudget}
+Empresa: ${leadData.company || 'Não informada'}
+Faturamento: ${leadData.revenue || 'Não informado'}
 Data/Hora Agendamento: ${leadData.scheduledDateTime || 'Não agendado'}
 
 WhatsApp: ${leadData.whatsapp}
@@ -389,6 +398,10 @@ Email: ${leadData.email}
         {
           key: 'pagina_origem',
           value: leadData.sourcePage
+        },
+        {
+          key: 'faturamento',
+          value: leadData.revenue || 'Não informado'
         }
       ]
     })
@@ -409,6 +422,10 @@ Email: ${leadData.email}
         {
           key: 'pagina_origem',
           value: leadData.sourcePage
+        },
+        {
+          key: 'faturamento',
+          value: leadData.revenue || 'Não informado'
         }
       ]
     })
@@ -423,7 +440,7 @@ Email: ${leadData.email}
     }
 
     console.log('🎉 Lead processado com sucesso no Go High Level!')
-    
+
     // 4. Enviar notificação por email
     try {
       const notifyResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/ghl-notify-lead`, {
@@ -446,7 +463,7 @@ Email: ${leadData.email}
     } catch (notifyError) {
       console.warn('⚠️ Erro ao enviar notificação por email:', notifyError)
     }
-    
+
     return {
       contact: contactResult.contact,
       opportunity: opportunityResult.opportunity,

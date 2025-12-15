@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ========================================
+   SILICON VALLEY PREMIUM THEME - RARITY AGENCY
+   ======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Palette: Deep Space & Neon */
+  --bg-deep: #050505;
+  --bg-card: rgba(255, 255, 255, 0.03);
+  --primary-neon: #A855F7;
+  --primary-glow: rgba(168, 85, 247, 0.5);
+  --secondary-neon: #D8B4FE;
+  --text-primary: #FFFFFF;
+  --text-secondary: #94A3B8;
+
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== RESET & BASE ===== */
+body {
+  background-color: var(--bg-deep);
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(126, 34, 206, 0.15) 0%, transparent 60%),
+    linear-gradient(to bottom, transparent, #000000),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23A855F7' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  color: var(--text-primary);
+  font-family: var(--font-inter);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ===== TYPOGRAPHY ===== */
+h1,
+.h1 {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: white;
+  text-shadow: 0 0 40px rgba(168, 85, 247, 0.2);
+}
+
+p {
+  color: var(--text-secondary);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* ===== COMPONENTS ===== */
+
+/* Glass Pill (for tags) */
+.glass-pill {
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.1), inset 0 0 10px rgba(168, 85, 247, 0.05);
+  backdrop-filter: blur(8px);
+  border-radius: 9999px;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #E9D5FF;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Premium Card */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Neon Glow Text */
+.text-glow {
+  text-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, #FFFFFF 0%, #D8B4FE 50%, #A855F7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Silicon Valley Button */
+.btn-primary {
+  background: linear-gradient(180deg, #9333EA 0%, #7E22CE 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow:
+    0 0 20px rgba(147, 51, 234, 0.3),
+    0 4px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: white;
+  font-weight: 600;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 30px rgba(147, 51, 234, 0.5),
+    0 6px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 10px rgba(147, 51, 234, 0.2);
+}
+
+/* Arrow Animation */
+.animate-float {
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+    opacity: 0.7;
+  }
+
+  50% {
+    transform: translateY(10px);
+    opacity: 1;
+    text-shadow: 0 0 10px var(--primary-neon);
+  }
+
+  100% {
+    transform: translateY(0px);
+    opacity: 0.7;
+  }
+}
+
+/* ===== MOBILE OPTIMIZATIONS ===== */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 2.25rem !important;
+    line-height: 1.1 !important;
+  }
+
+  .glass-pill {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
+
+  section {
+    padding-top: 1rem;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}

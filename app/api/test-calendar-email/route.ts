@@ -4,7 +4,7 @@ import { createCalendarEvent } from '@/lib/googleSheets'
 export async function POST(request: NextRequest) {
   try {
     const { email } = await request.json()
-    
+
     if (!email) {
       return NextResponse.json(
         { error: 'Email é obrigatório' },
@@ -23,7 +23,7 @@ Data do teste: ${new Date().toLocaleString('pt-BR')}
 Se você receber este email, significa que a integração está funcionando corretamente.`,
       startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Amanhã
       endTime: new Date(Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000).toISOString(), // Amanhã + 1 hora
-      attendees: [email, 'matheusdrarity@gmail.com']
+      attendees: [email, 'caiorarity@gmail.com']
     }
 
     console.log('🧪 Criando evento de teste para verificar emails...')
@@ -31,7 +31,7 @@ Se você receber este email, significa que a integração está funcionando corr
     console.log('📅 Dados do evento:', JSON.stringify(testEventData, null, 2))
 
     const result = await createCalendarEvent(testEventData)
-    
+
     return NextResponse.json({
       success: true,
       message: 'Evento de teste criado com sucesso',
@@ -48,9 +48,9 @@ Se você receber este email, significa que a integração está funcionando corr
 
   } catch (error) {
     console.error('❌ Erro no teste de email do calendário:', error)
-    
+
     return NextResponse.json(
-      { 
+      {
         error: 'Erro ao testar email do calendário',
         details: error instanceof Error ? error.message : 'Erro desconhecido',
         possibleCauses: [

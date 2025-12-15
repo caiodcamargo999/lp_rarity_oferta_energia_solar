@@ -2,18 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Calendar, Clock, CheckCircle, ArrowRight, ArrowLeft, RefreshCw } from 'lucide-react'
+import { X, Calendar, Clock, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { usePathname } from 'next/navigation'
 
 interface FormData {
   name: string
   whatsapp: string
   email: string
+  company: string
+  revenue: string
   painPoint: string
-  budget: string
 }
 
 interface TimeSlot {
@@ -88,12 +88,13 @@ interface LeadCaptureModalProps {
 }
 
 const steps = [
-  { id: 'name', title: 'Qual é o seu nome?', field: 'name' as keyof FormData },
-  { id: 'whatsapp', title: 'Qual é o seu WhatsApp?', field: 'whatsapp' as keyof FormData },
-  { id: 'email', title: 'Qual é o seu e-mail?', field: 'email' as keyof FormData },
-  { id: 'pain', title: 'Qual sua maior dor para crescer seu negócio de energia solar?', field: 'painPoint' as keyof FormData },
-  { id: 'budget', title: 'Para dobrar suas vendas em até 90 dias, é necessário investir pelo menos R$25.000 nesse período para a estrutura e estratégias que tornam essa alavancagem possível. Você tem essa disponibilidade de orçamento?', field: 'budget' as keyof FormData },
-  { id: 'schedule', title: 'Escolha um horário para sua sessão estratégica' },
+  { id: 'name', title: 'Qual é o seu nome completo?', field: 'name' as keyof FormData },
+  { id: 'whatsapp', title: 'Qual é o seu WhatsApp para contato?', field: 'whatsapp' as keyof FormData },
+  { id: 'email', title: 'Qual é o seu melhor e-mail corporativo?', field: 'email' as keyof FormData },
+  { id: 'company', title: 'Qual o nome da sua empresa de Energia Solar?', field: 'company' as keyof FormData },
+  { id: 'revenue', title: 'Qual é o faturamento mensal médio da sua empresa?', field: 'revenue' as keyof FormData },
+  { id: 'pain', title: 'Qual é o maior gargalo que impede seu crescimento hoje?', field: 'painPoint' as keyof FormData },
+  { id: 'schedule', title: 'Escolha o melhor horário para sua Sessão Estratégica' },
 ]
 
 export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalProps) {
@@ -103,8 +104,9 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
     name: '',
     whatsapp: '',
     email: '',
-    painPoint: '',
-    budget: ''
+    company: '',
+    revenue: '',
+    painPoint: ''
   })
   const [selectedDay, setSelectedDay] = useState<string>('')
   const [selectedDayDisplay, setSelectedDayDisplay] = useState<string>('')
@@ -127,9 +129,9 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
     }
   }, [isOpen])
 
-  // PRE-LOADING: Carregar horários reais do calendário quando chegar no step 4 (orçamento)
+  // PRE-LOADING: Carregar horários reais do calendário quando chegar no step 5 (dor)
   useEffect(() => {
-    if (isOpen && currentStep === 4) {
+    if (isOpen && currentStep === 5) {
       console.log('🚀 Iniciando pre-loading de horários do calendário...')
       preloadCalendarSlots()
     }
@@ -168,7 +170,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
   // Gerar horários instantaneamente quando um dia for selecionado
   const getInstantTimeSlots = (date: string): string[] => {
     const now = new Date()
-    const brasiliaTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}))
+    const brasiliaTime = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }))
 
     // Gerar ID de hoje no mesmo formato
     const year = brasiliaTime.getFullYear()
@@ -223,10 +225,12 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
       case 'email':
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         return !emailRegex.test(value) ? 'E-mail deve ter um formato válido' : ''
+      case 'company':
+        return value.trim().length < 2 ? 'Nome da empresa é obrigatório' : ''
+      case 'revenue':
+        return !value ? 'Por favor, selecione uma faixa de faturamento' : ''
       case 'painPoint':
         return value.trim().length < 10 ? 'Descreva melhor sua dor (mínimo 10 caracteres)' : ''
-      case 'budget':
-        return !value ? 'Por favor, selecione uma opção' : ''
       default:
         return ''
     }
@@ -234,7 +238,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
-    
+
     const error = validateField(field, value)
     if (error) {
       setErrors(prev => ({ ...prev, [field]: error }))
@@ -253,44 +257,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
       }
     }
 
-    // Lógica especial para a pergunta de orçamento
-    console.log('🔍 Debug - currentStep:', currentStep, 'budget:', formData.budget)
-    console.log('🔍 Debug - steps[currentStep]:', steps[currentStep])
-    
-    if (currentStep === 4 && formData.budget === 'Não, não possuo.') {
-      console.log('✅ Condição atendida - processando lead sem orçamento')
-      
-      // Redirecionar para WhatsApp IMEDIATAMENTE
-      const whatsappNumber = '5548991369301'
-      const message = encodeURIComponent('Olá Matheus, vim do formulário da página da Rarity. No momento não tenho o orçamento mínimo disponível, mas gostaria de saber se existe alguma alternativa ou próximo passo para mim.')
-      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`
-      
-      console.log('📱 Redirecionando para WhatsApp IMEDIATAMENTE:', whatsappUrl)
-      
-      // Redirecionar para WhatsApp IMEDIATAMENTE
-      window.location.href = whatsappUrl
-      
-      // Fechar modal
-      onClose()
-      
-      // Salvar dados no Google Sheets em background (fire and forget)
-      console.log('📊 Salvando dados no Google Sheets em background...')
-      handleSubmitWithoutSchedule()
-        .then(result => {
-          if (result) {
-            console.log('✅ Dados salvos com sucesso em background!')
-          } else {
-            console.log('⚠️ Falha ao salvar dados em background')
-          }
-        })
-        .catch(error => {
-          console.error('❌ Erro ao salvar dados em background:', error)
-        })
-      
-      return
-    } else {
-      console.log('❌ Condição não atendida - continuando fluxo normal')
-    }
+    // Logic removed
 
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1)
@@ -303,47 +270,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
     }
   }
 
-  const handleSubmitWithoutSchedule = async (): Promise<boolean> => {
-    try {
-      const requestData = {
-        ...formData,
-        scheduledDate: null,
-        scheduledTime: null,
-        sourcePage: pathname || '/',
-        hasBudget: formData.budget === 'Sim, tenho.' ? 'sim' : 'não'
-      }
-      
-      console.log('📤 Enviando dados para API:', requestData)
-      console.log('📤 FormData original:', formData)
-      console.log('📤 Pathname:', pathname)
-      
-      const response = await fetch('/api/leads', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      })
 
-      const responseData = await response.json()
-      console.log('📥 Resposta da API:', responseData)
-      console.log('📊 Status da resposta:', response.status)
-      console.log('📊 Response OK:', response.ok)
-
-      if (response.ok) {
-        console.log('✅ Lead processado com sucesso!')
-        console.log('✅ Dados salvos no Google Sheets!')
-        return true
-      } else {
-        console.error('❌ Erro ao processar lead:', response.status, responseData)
-        return false
-      }
-    } catch (error) {
-      console.error('❌ Erro ao enviar formulário:', error)
-      console.error('❌ Stack trace:', error instanceof Error ? error.stack : 'N/A')
-      return false
-    }
-  }
 
   const handleSubmit = async () => {
     if (!selectedTimeSlot) {
@@ -352,7 +279,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
 
     // Mostrar confirmação IMEDIATAMENTE
     setIsSuccess(true)
-    
+
     // Processar em background (sem bloquear a UI)
     try {
       const response = await fetch('/api/leads', {
@@ -365,7 +292,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
           scheduledDate: selectedDay,
           scheduledTime: selectedTimeSlot,
           sourcePage: pathname || '/', // Pass the current page path
-          hasBudget: formData.budget === 'Sim, tenho.' ? 'sim' : 'não'
+          hasBudget: 'sim' // Assume sim since budget question was removed
         }),
       })
 
@@ -386,16 +313,16 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
   const formatWhatsApp = (value: string) => {
     // Remove tudo que não é número
     const numbers = value.replace(/\D/g, '')
-    
+
     // Se não tem números, retorna vazio
     if (numbers.length === 0) return ''
-    
+
     // Se começa com 55, remove para permitir edição
     let formatted = numbers
     if (numbers.startsWith('55') && numbers.length > 2) {
       formatted = numbers.substring(2)
     }
-    
+
     // Aplica formatação brasileira
     if (formatted.length <= 2) {
       return `(${formatted}`
@@ -425,7 +352,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
     const value = e.target.value
     const formatted = formatWhatsApp(value)
     setFormData(prev => ({ ...prev, whatsapp: formatted }))
-    
+
     // Validação em tempo real
     if (formatted.length > 0) {
       const isValid = validateWhatsApp(formatted)
@@ -474,7 +401,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
             >
               <X size={16} />
             </button>
-            
+
             {/* Progress Bar */}
             <div className="w-full bg-gray-800/50 rounded-full h-1.5 mb-4">
               <motion.div
@@ -484,7 +411,7 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                 transition={{ duration: 0.3 }}
               />
             </div>
-            
+
             <div className="text-center">
               <h2 className="text-xl font-semibold text-white mb-1">
                 Sessão Estratégica Gratuita
@@ -513,16 +440,16 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                   Sua sessão estratégica foi agendada com sucesso! Você receberá um e-mail de confirmação com o link do Google Meet.
                 </p>
                 <div className="text-xs text-gray-500 font-light mb-6">
-                  <p>{new Date(selectedDay).toLocaleDateString('pt-BR', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
+                  <p>{new Date(selectedDay).toLocaleDateString('pt-BR', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
                   })}</p>
                   <p>{selectedTimeSlot} (Brasília)</p>
                   <p>Check-in: 15 minutos antes</p>
                 </div>
-                
+
                 <Button
                   onClick={() => {
                     setIsSuccess(false)
@@ -560,14 +487,14 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                 >
                   {currentStep === 0 && (
                     <div className="space-y-3">
-                                             <Input
-                         type="text"
-                         value={formData.name}
-                         onChange={(e) => handleInputChange('name', e.target.value)}
-                         onKeyPress={handleKeyPress}
-                         placeholder="Digite seu nome completo"
-                         className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-900/5 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
-                       />
+                      <Input
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => handleInputChange('name', e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="Digite seu nome completo"
+                        className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-900/5 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
+                      />
                       {errors.name && (
                         <p className="text-red-300/60 text-xs opacity-70">{errors.name}</p>
                       )}
@@ -576,14 +503,14 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
 
                   {currentStep === 1 && (
                     <div className="space-y-3">
-                                             <Input
-                         type="tel"
-                         value={formData.whatsapp}
-                         onChange={handleWhatsAppChange}
-                         onKeyPress={handleKeyPress}
-                         placeholder="(XX) XXXXX-XXXX"
-                         className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-900/5 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
-                       />
+                      <Input
+                        type="tel"
+                        value={formData.whatsapp}
+                        onChange={handleWhatsAppChange}
+                        onKeyPress={handleKeyPress}
+                        placeholder="(XX) XXXXX-XXXX"
+                        className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-900/5 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
+                      />
                       {errors.whatsapp && (
                         <p className="text-red-300/60 text-xs opacity-70">{errors.whatsapp}</p>
                       )}
@@ -592,14 +519,14 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
 
                   {currentStep === 2 && (
                     <div className="space-y-3">
-                                             <Input
-                         type="email"
-                         value={formData.email}
-                         onChange={(e) => handleInputChange('email', e.target.value)}
-                         onKeyPress={handleKeyPress}
-                         placeholder="seu@email.com"
-                         className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-900/5 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
-                       />
+                      <Input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="seu@email.com"
+                        className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-900/5 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
+                      />
                       {errors.email && (
                         <p className="text-red-300/60 text-xs opacity-70">{errors.email}</p>
                       )}
@@ -608,74 +535,70 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
 
                   {currentStep === 3 && (
                     <div className="space-y-3">
-                                             <textarea
-                         value={formData.painPoint}
-                         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('painPoint', e.target.value)}
-                         onKeyPress={handleKeyPress}
-                         placeholder="Descreva sua maior dificuldade para crescer no mercado de energia solar..."
-                         rows={3}
-                         className="w-full text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400/80 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all resize-none px-4 py-3 border rounded-xl"
-                       />
+                      <Input
+                        type="text"
+                        value={formData.company}
+                        onChange={(e) => handleInputChange('company', e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="Nome da sua empresa"
+                        className="w-full h-11 text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-900/5 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all"
+                      />
+                      {errors.company && (
+                        <p className="text-red-300/60 text-xs opacity-70">{errors.company}</p>
+                      )}
+                    </div>
+                  )}
+
+                  {currentStep === 4 && (
+                    <div className="space-y-3">
+                      <div className="grid gap-2">
+                        {['Até R$ 50k/mês', 'Entre R$ 50k e R$ 100k/mês', 'Entre R$ 100k e R$ 300k/mês', 'Acima de R$ 300k/mês'].map((option) => (
+                          <button
+                            key={option}
+                            onClick={() => handleInputChange('revenue', option)}
+                            className={`w-full p-3 rounded-xl border transition-all text-left ${formData.revenue === option
+                              ? 'border-primary-500 bg-primary-500/20 text-white shadow-lg'
+                              : 'border-gray-600/50 bg-gray-800/30 text-gray-300 hover:border-primary-500/50 hover:bg-primary-500/10 hover:shadow-md'
+                              }`}
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className={`w-4 h-4 rounded-full border-2 ${formData.revenue === option
+                                ? 'border-primary-500 bg-primary-500'
+                                : 'border-gray-500'
+                                }`}>
+                                {formData.revenue === option && (
+                                  <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                                )}
+                              </div>
+                              <span className="font-medium text-sm">{option}</span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                      {errors.revenue && (
+                        <p className="text-red-300/60 text-xs opacity-70">{errors.revenue}</p>
+                      )}
+                    </div>
+                  )}
+
+                  {currentStep === 5 && (
+                    <div className="space-y-3">
+                      <textarea
+                        value={formData.painPoint}
+                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('painPoint', e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="Descreva sua maior dificuldade para crescer no mercado de energia solar..."
+                        rows={3}
+                        className="w-full text-base bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400/80 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 rounded-xl transition-all resize-none px-4 py-3 border rounded-xl"
+                      />
                       {errors.painPoint && (
                         <p className="text-red-300/60 text-xs opacity-70">{errors.painPoint}</p>
                       )}
                     </div>
                   )}
 
-                  {currentStep === 4 && (
-                    <div className="space-y-4">
-                      <div className="space-y-3">
-                        <button
-                          onClick={() => handleInputChange('budget', 'Sim, tenho.')}
-                          className={`w-full p-4 rounded-xl border transition-all text-left ${
-                            formData.budget === 'Sim, tenho.'
-                              ? 'border-primary-500 bg-primary-500/20 text-white shadow-lg'
-                              : 'border-gray-600/50 bg-gray-800/30 text-gray-300 hover:border-primary-500/50 hover:bg-primary-500/10 hover:shadow-md'
-                          }`}
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div className={`w-4 h-4 rounded-full border-2 ${
-                              formData.budget === 'Sim, tenho.'
-                                ? 'border-primary-500 bg-primary-500'
-                                : 'border-gray-500'
-                            }`}>
-                              {formData.budget === 'Sim, tenho.' && (
-                                <div className="w-full h-full rounded-full bg-white scale-50"></div>
-                              )}
-                            </div>
-                            <span className="font-medium">Sim, tenho.</span>
-                          </div>
-                        </button>
+                  {currentStep === 6 && ( // Agora step 6 é o schedule
 
-                        <button
-                          onClick={() => handleInputChange('budget', 'Não, não possuo.')}
-                          className={`w-full p-4 rounded-xl border transition-all text-left ${
-                            formData.budget === 'Não, não possuo.'
-                              ? 'border-primary-500 bg-primary-500/20 text-white shadow-lg'
-                              : 'border-gray-600/50 bg-gray-800/30 text-gray-300 hover:border-primary-500/50 hover:bg-primary-500/10 hover:shadow-md'
-                          }`}
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div className={`w-4 h-4 rounded-full border-2 ${
-                              formData.budget === 'Não, não possuo.'
-                                ? 'border-primary-500 bg-primary-500'
-                                : 'border-gray-500'
-                            }`}>
-                              {formData.budget === 'Não, não possuo.' && (
-                                <div className="w-full h-full rounded-full bg-white scale-50"></div>
-                              )}
-                            </div>
-                            <span className="font-medium">Não, não possuo.</span>
-                          </div>
-                        </button>
-                      </div>
-                      {errors.budget && (
-                        <p className="text-red-300/60 text-xs opacity-70">{errors.budget}</p>
-                      )}
-                    </div>
-                  )}
-
-                  {currentStep === 5 && (
                     <div className="space-y-6">
                       {/* Seleção de Dia */}
                       <div className="space-y-3">
@@ -690,11 +613,10 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                               <button
                                 key={day.id}
                                 onClick={() => handleDaySelection(day.id, displayDate)}
-                                className={`p-4 rounded-xl border transition-all text-center ${
-                                  selectedDay === day.id
-                                    ? 'border-primary-500 bg-primary-500/20 text-white shadow-lg'
-                                    : 'border-gray-600/50 bg-gray-800/30 text-gray-300 hover:border-primary-500/50 hover:bg-primary-500/10 hover:shadow-md'
-                                }`}
+                                className={`p-4 rounded-xl border transition-all text-center ${selectedDay === day.id
+                                  ? 'border-primary-500 bg-primary-500/20 text-white shadow-lg'
+                                  : 'border-gray-600/50 bg-gray-800/30 text-gray-300 hover:border-primary-500/50 hover:bg-primary-500/10 hover:shadow-md'
+                                  }`}
                               >
                                 <div className="space-y-1">
                                   <div className="text-xs text-gray-400 uppercase tracking-wide">
@@ -728,11 +650,10 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                                 <button
                                   key={slot}
                                   onClick={() => setSelectedTimeSlot(slot)}
-                                  className={`p-3 rounded-xl border transition-all ${
-                                    selectedTimeSlot === slot
-                                      ? 'border-primary-500 bg-primary-500/20 text-white shadow-lg'
-                                      : 'border-gray-600/50 bg-gray-800/30 text-gray-300 hover:border-primary-500/50 hover:bg-primary-500/10 hover:shadow-md'
-                                  }`}
+                                  className={`p-3 rounded-xl border transition-all ${selectedTimeSlot === slot
+                                    ? 'border-primary-500 bg-primary-500/20 text-white shadow-lg'
+                                    : 'border-gray-600/50 bg-gray-800/30 text-gray-300 hover:border-primary-500/50 hover:bg-primary-500/10 hover:shadow-md'
+                                    }`}
                                 >
                                   <div className="flex items-center justify-center space-x-2">
                                     <Clock size={14} />
@@ -759,11 +680,10 @@ export default function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalPr
                     onClick={handleBack}
                     disabled={currentStep === 0}
                     variant="ghost"
-                    className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl transition-all ${
-                      currentStep === 0
-                        ? 'text-gray-600 cursor-not-allowed'
-                        : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
-                    }`}
+                    className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl transition-all ${currentStep === 0
+                      ? 'text-gray-600 cursor-not-allowed'
+                      : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
+                      }`}
                   >
                     <ArrowLeft size={16} />
                     <span>Voltar</span>
